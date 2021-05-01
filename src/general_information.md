@@ -1,0 +1,238 @@
+# General Information
+
+This file documents general information on the executable, compiler used, and operating environment.
+
+### Compiler Information
+
+TM2PC was compiled with the Watcom C/C++ 32-bit compiler and runtime. There are no debug symbols
+available for any version of TM2. The game itself is programmed in C.
+
+### Operating Environment
+
+TM2PC was compiled for Win32 and uses various userland functions of the Win32 API. Additionally,
+TM2PC imports most of the DirectX libraries to handle movies/sound/input/rendering. DirectDraw,
+DirectSound, DirectInput, and DirectPlay are all imported.
+
+The game normally requires the user to have the CD in a CD drive, even with the game installed on the
+PC. It will continuously loop looking for a CD drive with the file "tm2.ico" and pull up a 
+MessageBoxA asking the user to insert the CD if it is not found.
+
+The game uses registry keys to save the install directory, CD drive letter prefix, and other minor
+data.
+
+### Imports
+
+These were dumped from IDA Pro.
+
+ Address | Ordinal | Name | Library
+ ------- | ------- | ---- | -------
+00C90134|		|RegCloseKey|	ADVAPI32
+00C90138|		|RegOpenKeyA|	ADVAPI32
+00C90140|		|RegOpenKeyExA|	ADVAPI32
+00C90144|		|RegQueryValueExA|	ADVAPI32
+00C90148|		|RegSetValueExA|	ADVAPI32
+00C9015C|		|CoInitialize|	ole32
+00C90160|		|CoUninitialize|	ole32
+00C901C4|		|BitBlt	|	GDI32
+00C901C8|		|CreateCompatibleDC|	GDI32
+00C901CC|		|CreateFontA|	GDI32
+00C901D0|		|CreatePalette|	GDI32
+00C901D4|		|CreateSolidBrush|	GDI32
+00C901D8|		|DeleteDC	|	GDI32
+00C901DC|		|DeleteObject|	GDI32
+00C901E0|		|ExtTextOutA|	GDI32
+00C901E4|		|GetDeviceCaps|	GDI32
+00C901E8|		|GetObjectA	|	GDI32
+00C901EC|		|GetStockObject	|	GDI32
+00C901F0|		|GetTextExtentPoint32A|	GDI32
+00C901F4|		|GetTextFaceA|	GDI32
+00C901F8|		|GetTextMetricsA|	GDI32
+00C901FC|		|RealizePalette	|	GDI32
+00C90200|		|SelectObject|	GDI32
+00C90204|		|SelectPalette|	GDI32
+00C90208|		|SetBkColor|	GDI32
+00C9020C|		|SetBkMode|	GDI32
+00C90210|		|SetTextColor|	GDI32
+00C90214|		|StretchDIBits|	GDI32
+00C90218|		|TextOutA|	GDI32
+00C902A4|		|CloseHandle|	KERNEL32
+00C902A8|		|CreateFileA|	KERNEL32
+00C902AC|		|CreateMutexA|	KERNEL32
+00C902B0|		|CreateProcessA|	KERNEL32
+00C902B4|		|CreateThread|	KERNEL32
+00C902B8|		|FindResourceA|	KERNEL32
+00C902BC|		|FreeLibrary|	KERNEL32
+00C902C0|		|FreeResource|	KERNEL32
+00C902C4|		|GetCommandLineA|	KERNEL32
+00C902C8|		|GetDriveTypeA|	KERNEL32
+00C902CC|		|GetExitCodeProcess|	KERNEL32
+00C902D0|		|GetFileSize|	KERNEL32
+00C902D4|		|GlobalAlloc|	KERNEL32
+00C902D8|		|GlobalFree|	KERNEL32
+00C902DC|		|GlobalLock|	KERNEL32
+00C902E0|		|GlobalUnlock|	KERNEL32
+00C902E4|		|LoadLibraryA|	KERNEL32
+00C902E8|		|LoadResource|	KERNEL32
+00C902EC|		|LockResource|	KERNEL32
+00C902F0|		|QueryPerformanceCounter|	KERNEL32
+00C902F4|		|QueryPerformanceFrequency|	KERNEL32
+00C902F8|		|ReadFile|	KERNEL32
+00C902FC|		|ReleaseMutex|	KERNEL32
+00C90300|		|SetFilePointer|	KERNEL32
+00C90304|		|Sleep|	KERNEL32
+00C90308|		|TerminateThread|	KERNEL32
+00C9030C|		|WaitForSingleObject|	KERNEL32
+00C90310|		|WriteFile|	KERNEL32
+00C90314|		|lstrcatA|	KERNEL32
+00C90318|		|lstrcmpA|	KERNEL32
+00C9031C|		|lstrcpyA|	KERNEL32
+00C90320|		|lstrlenA|	KERNEL32
+00C90464|		|AdjustWindowRect|	USER32
+00C90468|		|BeginPaint|	USER32
+00C9046C|		|CallWindowProcA|	USER32
+00C90470|		|ClientToScreen|	USER32
+00C90474|		|ClipCursor|	USER32
+00C90478|		|CreateAcceleratorTableA|	USER32
+00C9047C|		|CreateDialogParamA|	USER32
+00C90480|		|CreateWindowExA|	USER32
+00C90484|		|DefWindowProcA|	USER32
+00C90488|		|DestroyAcceleratorTable|	USER32
+00C9048C|		|DestroyWindow|	USER32
+00C90490|		|DialogBoxParamA|	USER32
+00C90494|		|DispatchMessageA|	USER32
+00C90498|		|DrawMenuBar|	USER32
+00C9049C|		|DrawTextA|	USER32
+00C904A0|		|EnableWindow|	USER32
+00C904A4|		|EndDialog|	USER32
+00C904A8|		|EndPaint|	USER32
+00C904AC|		|FillRect|	USER32
+00C904B0|		|FlashWindow|	USER32
+00C904B4|		|FrameRect|	USER32
+00C904B8|		|GetAsyncKeyState|	USER32
+00C904BC|		|GetClientRect|	USER32
+00C904C0|		|GetCursorPos|	USER32
+00C904C4|		|GetDC|	USER32
+00C904C8|		|GetDlgItem|	USER32
+00C904CC|		|GetFocus|	USER32
+00C904D0|		|GetMenu|	USER32
+00C904D4|		|GetMenuItemInfoA|	USER32
+00C904D8|		|GetMessagePos|	USER32
+00C904DC|		|GetParent|	USER32
+00C904E0|		|GetPropA|	USER32
+00C904E4|		|GetSysColor|	USER32
+00C904E8|		|GetSystemMetrics|	USER32
+00C904EC|		|GetWindowLongA|	USER32
+00C904F0|		|GetWindowRect|	USER32
+00C904F4|		|IntersectRect|	USER32
+00C904F8|		|InvalidateRect|	USER32
+00C904FC|		|IsDialogMessageA|	USER32
+00C90500|		|IsIconic|	USER32
+00C90504|		|LoadAcceleratorsA|	USER32
+00C90508|		|LoadBitmapA|	USER32
+00C9050C|		|LoadCursorA|	USER32
+00C90510|		|LoadIconA|	USER32
+00C90514|		|LoadImageA|	USER32
+00C90518|		|LoadMenuA|	USER32
+00C9051C|		|LoadStringA|	USER32
+00C90520|		|MessageBeep|	USER32
+00C90524|		|MessageBoxA|	USER32
+00C90528|		|MoveWindow|	USER32
+00C9052C|		|OffsetRect|	USER32
+00C90530|		|PeekMessageA|	USER32
+00C90534|		|PostQuitMessage|	USER32
+00C90538|		|PostThreadMessageA|	USER32
+00C9053C|		|RegisterClassA|	USER32
+00C90540|		|RegisterWindowMessageA|	USER32
+00C90544|		|ReleaseDC|	USER32
+00C90548|		|RemovePropA|	USER32
+00C9054C|		|ScreenToClient|	USER32
+00C90550|		|SendMessageA|	USER32
+00C90554|		|SetActiveWindow|	USER32
+00C90558|		|SetClassLongA|	USER32
+00C9055C|		|SetCursorPos|	USER32
+00C90560|		|SetFocus|	USER32
+00C90564|		|SetForegroundWindow|	USER32
+00C90568|		|SetMenu|	USER32
+00C9056C|		|SetMenuItemInfoA|	USER32
+00C90570|		|SetPropA|	USER32
+00C90574|		|SetRect|	USER32
+00C90578|		|SetWindowLongA|	USER32
+00C9057C|		|SetWindowPos|	USER32
+00C90580|		|ShowCursor|	USER32
+00C90584|		|ShowWindow|	USER32
+00C90588|		|TranslateAcceleratorA|	USER32
+00C9058C|		|TranslateMessage|	USER32
+00C90590|		|UpdateWindow|	USER32
+00C90594|		|WaitMessage|	USER32
+00C90598|		|wvsprintfA|	USER32
+00C905F4|		|auxGetDevCapsA|	WINMM
+00C905F8|		|auxGetNumDevs|	WINMM
+00C905FC|		|auxGetVolume|	WINMM
+00C90600|		|auxSetVolume|	WINMM
+00C90604|		|joyGetDevCapsA|	WINMM
+00C90608|		|joyGetNumDevs|	WINMM
+00C9060C|		|joyGetPosEx|	WINMM
+00C90610|		|mciGetErrorStringA|	WINMM
+00C90614|		|mciSendCommandA|	WINMM
+00C90618|		|mciSendStringA|	WINMM
+00C9061C|		|mixerGetControlDetailsA|	WINMM
+00C90620|		|mixerGetDevCapsA|	WINMM
+00C90624|		|mixerGetLineControlsA|	WINMM
+00C90628|		|mixerGetLineInfoA|	WINMM
+00C9062C|		|mixerGetNumDevs|	WINMM
+00C90630|		|mixerSetControlDetails|	WINMM
+00C90634|		|timeBeginPeriod|	WINMM
+00C90638|		|timeEndPeriod|	WINMM
+00C9063C|		|timeGetDevCaps|	WINMM
+00C90640|		|timeGetTime|	WINMM
+00C90654|		|GetActiveWindow|	USER32
+00C90658|		|wsprintfA|	USER32
+00C90704|		|CloseHandle|	KERNEL32
+00C90708|		|CreateEventA|	KERNEL32
+00C9070C|		|CreateFileA|	KERNEL32
+00C90710|		|CreateMutexA|	KERNEL32
+00C90714|		|CreateThread|	KERNEL32
+00C90718|		|DeleteFileA|	KERNEL32
+00C9071C|		|ExitProcess|	KERNEL32
+00C90720|		|ExitThread|	KERNEL32
+00C90724|		|GetCommandLineA|	KERNEL32
+00C90728|		|GetConsoleMode|	KERNEL32
+00C9072C|		|GetCurrentProcessId|	KERNEL32
+00C90730|		|GetCurrentThreadId|	KERNEL32
+00C90734|		|GetCurrentThread|	KERNEL32
+00C90738|		|GetEnvironmentStrings|	KERNEL32
+00C9073C|		|GetFileType|	KERNEL32
+00C90740|		|GetLastError|	KERNEL32
+00C90744|		|GetModuleFileNameA|	KERNEL32
+00C90748|		|GetModuleHandleA|	KERNEL32
+00C9074C|		|GetProcAddress|	KERNEL32
+00C90750|		|GetStdHandle|	KERNEL32
+00C90754|		|GetVersion|	KERNEL32
+00C90758|		|LoadLibraryA|	KERNEL32
+00C9075C|		|ReadConsoleInputA|	KERNEL32
+00C90760|		|ReadFile|	KERNEL32
+00C90764|		|ReleaseMutex|	KERNEL32
+00C90768|		|RtlUnwind|	KERNEL32
+00C9076C|		|SetConsoleCtrlHandler|	KERNEL32
+00C90770|		|SetConsoleMode|	KERNEL32
+00C90774|		|SetEvent|	KERNEL32
+00C90778|		|SetFilePointer|	KERNEL32
+00C9077C|		|SetStdHandle|	KERNEL32
+00C90780|		|TlsAlloc|	KERNEL32
+00C90784|		|TlsFree|	KERNEL32
+00C90788|		|TlsGetValue|	KERNEL32
+00C9078C|		|TlsSetValue|	KERNEL32
+00C90790|		|VirtualAlloc|	KERNEL32
+00C90794|		|VirtualFree|	KERNEL32
+00C90798|		|WaitForSingleObject|	KERNEL32
+00C9079C|		|WriteConsoleA|	KERNEL32
+00C907A0|		|WriteFile|	KERNEL32
+00C907B0|		|DirectSoundCreate|	DSOUND
+00C907C0|		|DirectDrawCreate|	DDRAW
+00C907D4|	2	|__imp_DirectPlayEnumerateA|	DPLAYX
+00C907D8|	1	|__imp_DirectPlayCreate|	DPLAYX
+00C907F4|	17	|__imp_InitCommonControls|	COMCTL32
+00C907F8|		|ImageList_Add|	COMCTL32
+00C907FC|		|ImageList_Create|	COMCTL32
+00C90800|		|ImageList_Destroy|	COMCTL32
+00C90810|		|DirectInputCreateA|	DINPUT
