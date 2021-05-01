@@ -1,0 +1,39 @@
+This enum is used by `DisplayErrorMessage() @ 0x004BC660` to index
+into the `TMError` table at `0x004E8840`.
+
+```c
+enum ERROR_CODE {
+  ERR_CD_DRIVE_LOCKED               = 0,
+  ERR_CD_DRIVE_ERROR                = 1,
+  ERR_MOVIE_NO_HANDLE  	            = 2,
+  ERR_MOVIE_COULD_NOT_OPEN          = 3,
+  ERR_MOVIE_ACTIVEMOVIE_INIT_FAIL  	= 4,
+  ERR_MOVIE_ACTIVEMOVIE_RENDER_FAIL = 5,
+  ERR_MOVIE_ACTIVEMOVIE_PLAY_FAIL  	= 6,
+  ERR_MOVIE_ACTIVEMOVIE_PAUSE_FAIL  = 7,
+  ERR_MOVIE_ACTIVEMOVIE_STOP_FAIL  	= 8,
+  ERR_DRAW_CREATE_OBJ_FAIL          = 9,
+  ERR_DRAW_UNSUPPORTED_VIDEO_MODE   = 10,
+  ERR_DRAW_NO_BACKBUFFER            = 11,
+  ERR_DRAW_SURFACE_FAIL             = 12,
+  ERR_DRAW_CREATE_BACKBUFFER_FAIL   = 13,
+  ERR_DRAW_COOP_LEVEL_FAIL          = 14,
+  ERR_DRAW_CREATE_MEMBUFFER_FAIL    = 15,
+  ERR_DRAW_CREATE_CLIPPER_FAIL      = 16,
+  ERR_DRAW_ASSOC_CLIPPER_FAIL       = 17,
+  ERR_DRAW_ATTACH_CLIPPER_FAIL      = 18,
+  ERR_DRAW_UNSUPPORTED              = 19,
+  ERR_DRAW_NO_HARDWARE              = 20,
+  ERR_SOUND_INIT_FAIL               = 21,
+  ERR_CD_INSERT_CD                  = 22,
+  ERR_PLAY_INIT_FAIL                = 23,
+  ERR_PLAY_INIT_FAIL_2              = 24,
+  ERR_PLAY_ENUM_PLAYERS_FAIL        = 25,
+  ERR_PLAY_ENUM_SESSION_FAIL        = 26,
+  ERR_PLAY_CREATE_OBJ_FAIL          = 27,
+  ERR_NET_INVALID_LINK              = 28,
+  ERR_NET_OUT_OF_RANGE              = 29,
+  ERR_NET_PLAYER_ID_FAIL            = 30,
+  ERR_NET_NOT_AVAILABLE             = 31
+}
+```
