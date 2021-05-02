@@ -19,9 +19,9 @@ and `cmdLine` is the `LPSTR` command line string obtained from a call to `GetCom
 ```c
 int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
-  // Set up registry keys "Software\SingleTrac\default" and "Software\Sony Entertainment\Twisted Metal 2\1.0.1"
+  // Set up registry key "Software\Sony Entertainment\Twisted Metal 2\1.0.1"
   
-  // Save command line string and get Display Capabilities (screen width, height, bits per pixel) in a huge struct
+  // Process arguments and get Display Capabilities (screen width, height, bits per pixel)
   
   // Test if the game is running from a CD Drive - save the drive letter in a global variable if so
   
@@ -45,6 +45,31 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
   // Various de-init stuff if game function returns
 }
 ```
+
+### Set Up Registry Key
+
+The following functions are used to create the registry key `"Software\Sony Interactive\Twisted Metal 2\1.0.1"` 
+if it doesn't already exist. 
+
+```c
+PHKEY regkey;
+
+setRegKeyPath ("Software\Sony Interactive\Twisted Metal 2\1.0.1"); // @ 0x004AC4E8
+createRegKey (&regKey, HKEY_LOCAL_MACHINE, NULL); // @ 0x004AC550
+closeRegKey (&regKey); // @ 0x004AC590
+``` 
+
+### Process Arguments / Get Display Capabilities
+
+The `getEnvironment() @ 0x004C45C0` handles command line arguments and display capabilities,
+storing them in a `TMEnvironment` struct.
+
+```c
+TMEnvironment env;
+
+getEnvironment (&env); // @ 0x004C45C0
+```
   
-  
-  
+
+
+
