@@ -31,7 +31,7 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
   // Process arguments and get Display Capabilities (screen width, height, bits per pixel)
   TMEnvironment env;
 
-  getEnvironment (&env); // @ 0x004C45C0
+  envInit (&env); // @ 0x004C45C0
   
   // Test if the game is running from a CD Drive - save the drive letter in a global variable if so
   findCdDrive ("tm2.ico"); // @ 0x00499884
@@ -82,14 +82,38 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
     }
     
     // Register window class with name "Twisted Metal 2 Class"
-    
+    registerWindowClass ("Twisted Metal 2 Class", instance, CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW, NULL); // @ 0x004A6B80
   
     // Initialize window with the expected class name, title bar name ("Twisted Metal 2"), position, and size
-    //   save the associated handles in a TMWindow struct
+    // Save the associated handles in a TMWindow struct
+    windowInit ( // @ 0x004A6BE8
+       curWindow, // global TMWindow @ 0x00BDFCD0
+       WS_EX_APPWINDOW,
+       "Twisted Metal 2 Class",
+       "Twisted Metal 2",
+       WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+       x,
+       y,
+       rc.right,
+       rc.bottom,
+       NULL,
+       NULL,
+       instance
+       );
+    windowShow (curWindow, nShowCmd); // @ 0x004A6EE4
+    
+    // Boilerplate Win32 window setup
+    RECT rect;
+    HWND wnd = windowGetHwnd (curWindow); // @ 0x004A6DCC
+    HDC caps = GetDC (wnd);
+    GetClientRect (wnd, &rect);
+    FillRect (caps, &rect, GetStockObject (BLACK_BRUSH));
+    ReleaseDC (wnd, caps);    
   
-    // Jump to the main game function @ 0x00477124
+    // Jump to the main game function
+    runGame (envGetNumArgs (&env), envGetCmdArgs (&env), wnd, "Twisted Metal 2"); // @ 0x00477124
   }
-    // Various de-init stuff if game function returns
+  // Various de-init stuff if game function returns
 }
 ```
 

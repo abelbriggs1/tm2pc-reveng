@@ -1,7 +1,7 @@
 # Environment
 
 ```c
-void getEnvironment (TMEnvironment * env) { // @ 0x004C45C0
+void envInit (TMEnvironment * env) { // @ 0x004C45C0
   splitCmdArgs (env); // @ 0x004C465C
   
   // env->cmdArgs[0] will always be the path to the executable
@@ -29,7 +29,19 @@ void getEnvironment (TMEnvironment * env) { // @ 0x004C45C0
 ```
 
 ```c
-void splitCmdArgs (TMEnvironment * env) { // @ 0x004C465C
+char ** envGetCmdArgs (TMEnvironment * env) { // @ 0x004C471C
+  return env->cmdArgs;
+}
+```
+
+```c
+int envGetNumArgs (TMEnvironment * env) { // @ 0x004C4718
+  return env->numArgs;
+}
+```
+
+```c
+static void splitCmdArgs (TMEnvironment * env) { // @ 0x004C465C
   char * cmdLineStr = GetCommandLineA();
   BOOL quote = FALSE;
   

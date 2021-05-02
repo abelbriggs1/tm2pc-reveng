@@ -5,8 +5,9 @@ index into it. `DisplayErrorMessage() @ 0x004BC660` indexes into the table to pr
 `MessageBox`.
 
 ```c
-struct TMError {
+typedef struct {
   UINT msgBoxType;
   LPCSTR errorStrTitle;
   LPCSTR errorStrDescription;
-};
+} TMError;
+```

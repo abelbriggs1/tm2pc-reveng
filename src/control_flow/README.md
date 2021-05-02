@@ -1,7 +1,7 @@
 # Control Flow
 
-This folder is for documenting basic control flow of various modules in the game and
-mainly contains pseudocode and notes rather than pure C code.
+This folder is for documenting basic control flow of the various core functions,
+such as `WinMain` and the various game loop functions.
 
-If a module's code is complicated enough to require pure C code, it should likely
-be given its own folder.
+Self-contained module and library functions (such as the renderer API and file I/O functions)
+should be documented in the `code` folder.

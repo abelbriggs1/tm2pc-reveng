@@ -215,14 +215,14 @@ int DisplayErrorMessage (ERROR_CODE code, ...) { // @ 0x004BC660
   VA_LIST arglist;
   VA_START (arglist, code);
   
-  wvsprintfA (Text, tmErrorTable[code].errorStrDescription, arglist);
+  wvsprintfA (text, tmErrorTable[code].errorStrDescription, arglist);
   ShowCursor (TRUE);
-  HWND curHwnd = getCurHwndThunk (); // @ 0x004A8F39
+  HWND curHwnd = windowGetHwndThunk (); // @ 0x004A8F39, thunk for windowGetHwnd @ 0x004A6DCC
   HGDIOBJ obj = GetStockObject (BLACK_BRUSH);
   DWORD prevLong = SetClassLongA (curHwnd, GCL_HBRBACKGROUND, obj);
   int result = MessageBoxA (
                  curHwnd,
-                 Text,
+                 text,
                  tmErrorTable[code].errorStrTitle,
                  tmErrorTable[code].msgBoxType
                  );
