@@ -5,7 +5,7 @@
 `BOOL regKeyBufferEmpty = TRUE; // @ 0x004E8528`
 
 ```c
-void setRegKeyPath (LPCSTR key) { // 0x004AC4B0, 0x004AC4E8 (duplicate functions)
+void setRegKeyPath (LPCSTR key) { // @ 0x004AC4B0, 0x004AC4E8 (duplicate functions)
   if (key) {
     lstrcpyA (regKeyBuffer, key);
   } else if (regKeyBufferEmpty) {
@@ -44,9 +44,17 @@ LSTATUS openRegKey (PHKEY result, HKEY key, LPCSTR keyName) { // @ 0x004AC528
 ```
 
 ```c
-LSTATUS queryRegKeyValueExA (PHKEY handle, LPCSTR valueName, LPBYTE data) { // @ 0x004AC5BC
+LSTATUS queryRegKeyDword (PHKEY handle, LPCSTR valueName, LPBYTE data) { // @ 0x004AC5BC
   DWORD dataSize = 4;
   return RegQueryValueExA (*handle, valueName, NULL, NULL, data, &dataSize);
 }
 ```
+
+```c
+LSTATUS queryRegKey (PHKEY handle, LPCSTR valueName, LPBYTE data, LPDWORD size) { // @ 0x004AC5E4
+  return RegQueryValueExA (*handle, valueName, NULL, NULL, data, size);
+}
+```
+
+
 
