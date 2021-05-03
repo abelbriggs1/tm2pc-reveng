@@ -1,11 +1,13 @@
-# Contributing
+To contribute, you will need:
 
-To contribute, you will need a copy of either Ghidra or Hex-Rays IDA. There are advantages
-and disadvantages to both.
+- A copy of either Ghidra or Hex-Rays IDA.
+- A copy of Twisted Metal 2 PC
 
-The choice of tool is yours, as you should be able to produce similar results from both.
+## Tools
 
-## Ghidra
+The choice of reverse engineering tool is yours, as you should be able to produce similar results from both.
+
+### Ghidra
 
 [Ghidra](https://ghidra-sre.org/) is an open-source reverse engineering suite created by the
 United States National Security Agency (NSA) as an alternative to the popular, but
@@ -22,7 +24,7 @@ I was never able to get the calling convention to work quite properly and there 
 On the other hand, I found that Ghidra's decompiler produced *much* cleaner code than IDA Pro's decompiler
 and was easier to nudge into removing dead code and useless operations/variables.
 
-## IDA Pro
+### IDA Pro
 
 [Hex-Rays IDA Pro](https://www.hex-rays.com/ida-pro/) is the other option, an expensive but state-of-the-art 
 reverse engineering suite.
@@ -30,3 +32,20 @@ reverse engineering suite.
 I was able to import TM2.EXE into IDA without any issues, as it supports Watcom off the bat. I found it to be
 better at recognizing standard library calls than Ghidra, but the decompiler often produces total nonsense for me,
 and the tools to remove dead code/variables are much more limited.
+
+## Contributing
+
+To contribute, simply open TM2.EXE in your favorite reverse engineering tool and
+start copying information from this repository. Most function definitions, static/global
+variables, and function calls will have their addresses documented with `// @ (address)`.
+
+Once you've made progress in an undocumented module/function/structure, feel free to submit
+a pull request.
+
+## Directory Structure
+
+ - `code/`: raw module/library implementations
+ - `control_flow/`: basic control flow across the program, game loop functions
+ - `enums/`: enumerations
+ - `filetypes/`: binary file formats
+ - `structs/`: raw struct definitions
