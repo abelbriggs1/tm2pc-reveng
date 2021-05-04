@@ -1,6 +1,6 @@
-# Main
+This file documents the beginning of execution, the entry point `WinMain`, and the `main` function.
 
-This file documents the beginning of execution and the entry point `WinMain`.
+# WinMain
 
 `WinMain` is located at `0x004A8B04` in the executable and acts as the entry point.
 Since TM2PC runs on the Watcom runtime, there's some setup first, but nothing particularly
@@ -14,7 +14,11 @@ The call to `WinMain` is always made with the following arguments:
 where `currentInstance` is the `HINSTANCE` handle obtained from a call to `GetModuleHandleA(NULL)`
 and `cmdLine` is the `LPSTR` command line string obtained from a call to `GetCommandLineA()`.
 
-## Main Skeleton
+`WinMain` is effectively a wrapper around the actual `main` function and sets up the
+Windows environment and window. This is likely a result of the game being ported from
+the Playstation (the PC port came out more than a year later).
+
+## WinMain Skeleton
 
 ```c
 int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd) {
@@ -30,7 +34,6 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
   
   // Process arguments and get Display Capabilities (screen width, height, bits per pixel)
   TMEnvironment env;
-
   envInit (&env); // @ 0x004C45C0
   
   // Test if the game is running from a CD Drive - save the drive letter in a global variable if so
@@ -66,14 +69,12 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
     queryRegKeyDword (&regKey, "Window XPos", &x); // @ 0x004AC5BC
     queryRegKeyDword (&regKey, "Window YPos", &y); // @ 0x004AC5BC
     closeRegKey (&regKey); // @ 0x004AC590
-    
     if (rc.right + x > env.screenWidth) {
       x = env.screenWidth - rc.right;
     }
     if (x < 0) {
       x = 0;
     }
-    
     if (rc.bottom + y > env.screenHeight) {
       y = env.screenHeight - rc.bottom;
     }
@@ -110,11 +111,22 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
     FillRect (caps, &rect, GetStockObject (BLACK_BRUSH));
     ReleaseDC (wnd, caps);    
   
-    // Jump to the main game function
-    runGame (envGetNumArgs (&env), envGetCmdArgs (&env), wnd, "Twisted Metal 2"); // @ 0x00477124
+    // Jump to main
+    main (envGetNumArgs (&env), envGetCmdArgs (&env)); // @ 0x00477124
   }
-  // Various de-init stuff if game function returns
+  // TODO: Various de-init stuff if WinMain returns
 }
 ```
 
+# Main
 
+`main` is located at `0x00477124` and is the primary initialization function for
+the actual game state.
+
+# Main Skeleton
+
+```c
+int main (int argc, char ** argv) { // @ 0x00477124
+  // TODO: fill in main
+}
+```
