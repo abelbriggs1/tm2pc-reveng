@@ -4,7 +4,7 @@
 #define TM_ERROR_RETRY_YES (MB_ICONEXCLAMATION | MB_RETRYCANCEL) // 0x35
 #define TM_ERROR_RETRY_NO  (MB_ICONEXCLAMATION | MB_OK) // 0x30
 
-TMError tmErrorTable[32] { @ 0x004E8840
+static TMError tmErrorTable[32] { @ 0x004E8840
   {
     TM_ERROR_RETRY_YES,
     "CD Audio Error",

@@ -20,7 +20,12 @@ the Playstation (the PC port came out more than a year later).
 
 ## WinMain Skeleton
 
+HMODULE tmLibHandle;
+
 ```c
+static HMODULE tmLibHandle; // @ 0x00BDFB28
+static TMWindow curWindow; // @ 0x00BDFCD0
+
 int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
   RECT rc;
@@ -39,7 +44,7 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
   // Test if the game is running from a CD Drive - save the drive letter in a global variable if so
   findCdDrive ("tm2.ico"); // @ 0x00499884
   
-  loadLibrary (&tmLibHandle, "TM2English"); // loadLibrary @ 0x004C4558, tmLibHandle @ 0x00BDFB28
+  loadLibrary (&tmLibHandle, "TM2English"); // loadLibrary @ 0x004C4558
   
   // Open AVI video with the Windows MCI API
   openAviVideo (); // @ 0x004B9BF0
@@ -49,9 +54,7 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
     return 1;
   }
   
-  // Set jump buffer for RtlUnwind in case things go wrong
-  BOOL jumpBufSet = setjmp (recoveryMainJumpBuf) == 0; // jmp_buf recoveryMainJumpBuf @ 0x00BDFAF0
-  if (jumpBufSet) {
+  if (!setjmp ((jmp_buf *) 0x00BDFAF0)) {
   
     // Detect CDROM, initialize paths to various resources from registry if possible
     // This function returns 1 on success
@@ -88,7 +91,7 @@ int WinMain (HINSTANCE instance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nS
     // Initialize window with the expected class name, title bar name ("Twisted Metal 2"), position, and size
     // Save the associated handles in a TMWindow struct
     windowInit ( // @ 0x004A6BE8
-       curWindow, // global TMWindow @ 0x00BDFCD0
+       curWindow,
        WS_EX_APPWINDOW,
        "Twisted Metal 2 Class",
        "Twisted Metal 2",
@@ -125,8 +128,11 @@ the actual game state.
 
 # Main Skeleton
 
+`static TMSound sound; // @ 0x00624EDC`
+
 ```c
 int main (int argc, char ** argv) { // @ 0x00477124
   // TODO: fill in main
+  
 }
 ```

@@ -1,16 +1,16 @@
 # CD Drive / Directory Functions
 
-`char CdDriveLetter; // @ 0x00A3A5D0`
+`static char CdDriveLetter; // @ 0x00A3A5D0`
 
 ```c
-char pathExecutable[300]; // @ 0x00A39C68
-char pathShell[300]; // @ 0x00A39D94
-char pathDatabase[300]; // @ 0x00A39EC0
-char pathSaveGame[300]; // @ 0x00A39FEC
-char pathConfiguration[300]; // @ 0x00A3A118
-char pathSounds[300]; // @ 0x00A3A244
-char pathMovieDirectory[300]; // @ 0x00A3A370
-char pathTm2Ico[300]; // @ 0x00A3A49C
+static  char pathExecutable[300]; // @ 0x00A39C68
+static char pathShell[300]; // @ 0x00A39D94
+static char pathDatabase[300]; // @ 0x00A39EC0
+static char pathSaveGame[300]; // @ 0x00A39FEC
+static char pathConfiguration[300]; // @ 0x00A3A118
+static char pathSounds[300]; // @ 0x00A3A244
+static char pathMovieDirectory[300]; // @ 0x00A3A370
+static char pathTm2Ico[300]; // @ 0x00A3A49C
 ```
 
 ```c

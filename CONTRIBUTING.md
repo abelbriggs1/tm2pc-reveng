@@ -49,3 +49,16 @@ a pull request.
  - `enums/`: enumerations
  - `filetypes/`: binary file formats
  - `structs/`: raw struct definitions
+ 
+## Conventions
+
+ - This repository is effectively a **specification**, *not* a codebase (that comes later!).
+   Code is the documentation, so prefer readability and add comments if something's not obvious.
+ - When you are doing any of the following, please comment their location 
+   in the code in a single line comment with the format `// @ 0x(address)`.
+   This helps other contributors add symbols to their projects.
+   - Referencing a global variable
+   - Referencing a Twisted Metal function (not Win32 or standard library)
+   - Declaring a global or static variable
+   - Declaring a Twisted Metal function
+ - Two spaces per indent, avoid tabs. Win32 function calls get *loooong*.
