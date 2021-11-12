@@ -38,32 +38,79 @@ I was able to import TM2.EXE into IDA without any issues, as it supports Watcom 
 better at recognizing standard library calls than Ghidra, but the decompiler often produces total nonsense for me,
 and the tools to remove dead code/variables are much more limited.
 
+## Conventions
+
+### Code
+
+The code in this repository attempts to follow the coding style of the
+[EDK2 C Coding Standards](https://edk2-docs.gitbook.io/edk-ii-c-coding-standards-specification/).
+with the following specific notes:
+ - Use Win32 standard data types (including pointer typedefs) instead of 
+ - Do not use Hungarian notation for identifiers
+ - Column limit is 100 characters
+ - Function definitions do not need to be laid out vertically
+ - Function definitions and calls do not need the closing parenthesis `);` on a new line
+ 
+Please use the supplied `.clang-format` file with `clang-format` to format your code. `clang-format`
+is set up to programmatically enforce much of this code style, so if you simply allow it to format
+your code, there should be few issues. Identifier naming cannot be programmatically enforced, so
+please ensure you follow the EDK2 standard.
+
+### Comments
+
+When you are doing any of the following, please comment their location 
+in the code with the format `@ 0x(address)`. This helps other contributors
+add symbols to their projects.
+ - Defining a global or static variable/structure which exists in TM2.EXE
+ - Defining a Twisted Metal function
+
+Please use Doxygen-style comment blocks above all function prototypes and definitions.
+
+For commenting blocks of code, please use single-line `//` comments, with blank
+comment lines before and after the comment text.
+
+For commenting single lines of code, inline comments are acceptable.
+
+```
+/**
+ * Short summary of function.
+ *
+ * Longer summary with more details and sentences if necessary.
+ *
+ * Address: 0xDEADBEEF
+ *
+ * @param[in]   Handle        The handle to do something with.
+ * @param[out]  Val           The pointer where the result should be written.
+ *
+ * @retval      S_OK          The operation succeeded and a value was written
+ *                            to Val.
+ * @retval      E_INVALIDARG  Handle is NULL.
+ */
+HRESULT DoSomething (IN HANDLE Handle, OUT LPDWORD Val)
+{
+  //
+  // This is a comment for a code block.
+  //
+  DoSomethingElse (); // This is an inline comment
+  ...
+}
+```
+
 ## Contributing
 
 To contribute, simply open TM2.EXE in your favorite reverse engineering tool and
-start copying information from this repository. Most function definitions, static/global
-variables, and function calls will have their addresses documented with `// @ (address)`.
+start adding information from this repository. Most function definitions and static/global
+variables/structures will have their addresses documented with `@ (address)`.
 
 Once you've made progress in an undocumented module/function/structure, feel free to submit
 a pull request.
 
 ## Directory Structure
 
+TBD.
+
  - `code/`: raw module/library implementations
  - `control_flow/`: basic control flow across the program, game loop functions
  - `enums/`: enumerations
  - `filetypes/`: binary file formats
  - `structs/`: raw struct definitions
- 
-## Conventions
-
- - This repository is effectively a **specification**, *not* a codebase (that comes later!).
-   Code is the documentation, so prefer readability and add comments if something's not obvious.
- - When you are doing any of the following, please comment their location 
-   in the code in a single line comment with the format `// @ 0x(address)`.
-   This helps other contributors add symbols to their projects.
-   - Referencing a global variable
-   - Referencing a Twisted Metal function (not Win32 or standard library)
-   - Declaring a global or static variable
-   - Declaring a Twisted Metal function
- - Two spaces per indent, avoid tabs. Win32 function calls get *loooong*.
