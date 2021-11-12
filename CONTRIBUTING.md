@@ -1,3 +1,8 @@
+# NOTE
+
+The directory structure and contribution process are currently in flux, as this repository is
+changing from a documentation project to a decompilation project.
+
 To contribute, you will need:
 
 - A copy of either Ghidra or Hex-Rays IDA.
