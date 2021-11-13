@@ -1,0 +1,28 @@
+{
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.rulers": [
+        100
+    ],
+    "doxdocgen.file.fileOrder": [
+        "file",
+        "empty",
+        "brief"
+    ],
+    "doxdocgen.file.fileTemplate": "@file {name}",
+    "doxdocgen.generic.briefTemplate": "This is a summary of the function/file.",
+    "doxdocgen.generic.paramTemplate": "@param[in,out]{indent:16}{param}{indent:36}Parameter description.",
+    "doxdocgen.generic.returnTemplate": "@return{indent:16}{type}{indent:36}Return value/behavior description.",
+    "doxdocgen.generic.customTags": [
+        "@address        {address}"
+    ],
+    "doxdocgen.generic.order": [
+        "brief",
+        "empty",
+        "brief",
+        "empty",
+        "custom",
+        "param",
+        "return"
+    ]
+}

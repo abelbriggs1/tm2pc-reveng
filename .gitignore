@@ -52,4 +52,7 @@ Mkfile.old
 dkms.conf
 
 # IDE files
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json.default

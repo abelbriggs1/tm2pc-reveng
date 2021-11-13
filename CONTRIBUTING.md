@@ -1,16 +1,33 @@
-# NOTE
-
-The directory structure and contribution process are currently in flux, as this repository is
-changing from a documentation project to a decompilation project.
+# Contributing
 
 To contribute, you will need:
 
 - A copy of either Ghidra or Hex-Rays IDA.
 - A copy of Twisted Metal 2 PC
 
+Experience reading x86 assembly and low-level C programming is highly recommended.
+Experience reading and writing Win32 applications is helpful.
+
+To contribute, simply open TM2.EXE in your favorite reverse engineering tool and
+start adding information from this repository. Most function definitions and static/global
+variables/structures will have their addresses documented with `@address`.
+
+Once you've made progress in an undocumented module/function/structure, feel free to submit
+a pull request.
+
 ## Tools
 
-The choice of reverse engineering tool is yours, as you should be able to produce similar results from both.
+### Development
+
+Any IDE or editor can be used. If you would like your IDE files to be ignored, please submit an
+issue or PR.
+
+This repository includes a default configuration for Visual Studio Code which provides automatic
+generation of Doxygen comments and automatic code formatting with the supplied `clang-format` file.
+To use this default configuration, rename `.vscode/settings.json.default` to
+`.vscode/settings.json`.
+
+### Reverse Engineering
 
 ### Ghidra
 
@@ -18,75 +35,73 @@ The choice of reverse engineering tool is yours, as you should be able to produc
 United States National Security Agency (NSA) as an alternative to the popular, but
 extremely expensive, Hex-Rays IDA Pro.
 
-Ghidra specifically has a couple of problems with TM2.EXE. When I first attempted to use it,
-I needed to patch Ghidra to get around [#2496](https://github.com/NationalSecurityAgency/ghidra/issues/2496)
-and needed to manually insert a new calling convention due to [#156](https://github.com/NationalSecurityAgency/ghidra/issues/156),
-as Ghidra (at time of writing) does not support the Watcom compiler, which Twisted Metal 2 PC
-was compiled with.
+As of December 2021, Ghidra
+[does not support](https://github.com/NationalSecurityAgency/ghidra/issues/156) `watcall`,
+the calling convention used by legacy Watcom compilers. A user of Ghidra created a custom calling
+convention which works, but has several issues.
 
-I was never able to get the calling convention to work quite properly and there were a number of issues.
-
-On the other hand, I found that Ghidra's decompiler produced *much* cleaner code than IDA Pro's decompiler
-and was easier to nudge into removing dead code and useless operations/variables.
+On the other hand, Ghidra's decompiler appears to produce cleaner code than IDA Pro's decompiler.
 
 ### IDA Pro
 
-[Hex-Rays IDA Pro](https://www.hex-rays.com/ida-pro/) is the other option, an expensive but state-of-the-art 
-reverse engineering suite.
+[Hex-Rays IDA Pro](https://www.hex-rays.com/ida-pro/) is the other option, an expensive but
+state-of-the-art reverse engineering suite.
 
-I was able to import TM2.EXE into IDA without any issues, as it supports Watcom off the bat. I found it to be
-better at recognizing standard library calls than Ghidra, but the decompiler often produces total nonsense for me,
-and the tools to remove dead code/variables are much more limited.
+IDA has no trouble importing TM2.EXE and appears to be better at recognizing standard library
+calls than Ghidra.
 
 ## Conventions
 
-### Code
+### Format and Spacing
 
-The code in this repository attempts to follow the coding style of the
-[EDK2 C Coding Standards](https://edk2-docs.gitbook.io/edk-ii-c-coding-standards-specification/).
-with the following specific notes:
- - Use Win32 standard data types (including pointer typedefs) instead of 
- - Do not use Hungarian notation for identifiers
- - Column limit is 100 characters
- - Function definitions do not need to be laid out vertically
- - Function definitions and calls do not need the closing parenthesis `);` on a new line
- 
-Please use the supplied `.clang-format` file with `clang-format` to format your code. `clang-format`
-is set up to programmatically enforce much of this code style, so if you simply allow it to format
-your code, there should be few issues. Identifier naming cannot be programmatically enforced, so
-please ensure you follow the EDK2 standard.
+Please use the supplied `.clang-format` file with `clang-format` to automatically format your
+code. The `.clang-format` file is based on the Chromium style with minor modifications.
+
+### Identifiers
+
+- Use PascalCase for:
+  - Typenames (`typedef`, `struct`, `class`, `enum`, `union`)
+  - Functions
+- Use snake_case for:
+  - Variables
+  - File names
+- Use SNAKE_CASE for:
+  - Constants
+  - Macros
+- Avoid Hungarian notation.
+- Avoid capitalizing abbreviations in identifiers - prefer `TmRead()` over `TMRead()`.
+
+### C Programming
+
+- Use Win32 standard data types and idioms(including pointer typedefs) unless external
+   functions require otherwise.
 
 ### Comments
 
-When you are doing any of the following, please comment their location 
-in the code with the format `@ 0x(address)`. This helps other contributors
-add symbols to their projects.
- - Defining a global or static variable/structure which exists in TM2.EXE
- - Defining a Twisted Metal function
-
-Please use Doxygen-style comment blocks above all function prototypes and definitions.
+Please use Doxygen-style comment blocks above all function prototypes/definitions and
+at the top of new files.
 
 For commenting blocks of code, please use single-line `//` comments, with blank
 comment lines before and after the comment text.
 
 For commenting single lines of code, inline comments are acceptable.
 
-```
+```c
 /**
  * Short summary of function.
  *
  * Longer summary with more details and sentences if necessary.
  *
- * Address: 0xDEADBEEF
+ * @address     0xDEADBEEF
  *
- * @param[in]   Handle        The handle to do something with.
- * @param[out]  Val           The pointer where the result should be written.
+ * @param[in]   handle        The handle to do something with.
+ * @param[out]  val           The pointer where the result should be written.
  *
- * @retval      S_OK          The operation succeeded and a value was written
- *                            to Val.
- * @retval      E_INVALIDARG  Handle is NULL.
+ * @return      S_OK          The operation succeeded and a value was written
+ *                            to val.
+ * @return      E_INVALIDARG  handle is NULL.
  */
-HRESULT DoSomething (IN HANDLE Handle, OUT LPDWORD Val)
+HRESULT DoSomething (HANDLE handle, LPDWORD val)
 {
   //
   // This is a comment for a code block.
@@ -96,21 +111,13 @@ HRESULT DoSomething (IN HANDLE Handle, OUT LPDWORD Val)
 }
 ```
 
-## Contributing
+When you are doing any of the following, please comment their location
+in the code with the format `@address 0x(address)`. This helps other contributors
+add symbols to their projects.
 
-To contribute, simply open TM2.EXE in your favorite reverse engineering tool and
-start adding information from this repository. Most function definitions and static/global
-variables/structures will have their addresses documented with `@ (address)`.
-
-Once you've made progress in an undocumented module/function/structure, feel free to submit
-a pull request.
+- Defining a global or static variable/structure which exists in TM2.EXE
+- Defining a Twisted Metal function
 
 ## Directory Structure
 
 TBD.
-
- - `code/`: raw module/library implementations
- - `control_flow/`: basic control flow across the program, game loop functions
- - `enums/`: enumerations
- - `filetypes/`: binary file formats
- - `structs/`: raw struct definitions

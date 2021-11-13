@@ -1,5 +1,3 @@
-This file documents the beginning of execution, the entry point `WinMain`, and the `main` function.
-
 # WinMain
 
 `WinMain` is located at `0x004A8B04` in the executable and acts as the entry point.

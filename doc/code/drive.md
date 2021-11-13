@@ -139,5 +139,3 @@ int initPaths (const char * filename) { // @ 0x00498DDC
   return 1;
 }
 ```
-
-

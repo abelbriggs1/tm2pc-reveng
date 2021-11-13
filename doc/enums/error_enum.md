@@ -1,3 +1,5 @@
+# Error
+
 This enum is used by `DisplayErrorMessage() @ 0x004BC660` to index
 into the `TMError` table at `0x004E8840`.
 
