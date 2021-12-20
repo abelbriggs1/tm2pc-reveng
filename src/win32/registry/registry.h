@@ -19,25 +19,25 @@
  * @return     1                   key_name was NULL, but the library had already been initialized
  *                                 before this call.
  */
-int RegistryInit (LPCSTR key_name);
+DWORD TmRegistryInit (LPCSTR key_name);
 
 /**
  * Create a registry key with the given parameters, or open the key if it
  * already exists.
  *
- * If key_name is NULL, the key path set previously by RegistryInit() will be used.
+ * If key_name is NULL, the key path set previously by TmRegistryInit() will be used.
  *
  * @param[in,out]  result              Pointer to a variable which will receive the handle
  *                                     for the created/opened key.
  * @param[in]      key                 Handle for an open registry key.
  * @param[in]      key_name            Name of the subkey to create.
  */
-void RegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name);
+void TmRegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name);
 
 /**
  * Open a registry key.
  *
- * If key_name is NULL, the key path set previously by RegistryInit() will be used.
+ * If key_name is NULL, the key path set previously by TmRegistryInit() will be used.
  *
  * @param[in,out]  result              Pointer to a variable which will receive the handle
  *                                     for the opened key.
@@ -48,7 +48,7 @@ void RegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name);
  * @return         other               An error occurred opening the key. See the documentation
  *                                     for Win32 RegOpenKeyExA() for more information.
  */
-LSTATUS RegistryOpenKey (PHKEY result, HKEY key, LPCSTR key_name);
+LSTATUS TmRegistryOpenKey (PHKEY result, HKEY key, LPCSTR key_name);
 
 /**
  * Close a registry key.
@@ -59,7 +59,7 @@ LSTATUS RegistryOpenKey (PHKEY result, HKEY key, LPCSTR key_name);
  * @return         other               An error occurred closing the key. See the documentation
  *                                     for Win32 RegCloseKey() for more information.
  */
-LSTATUS RegistryCloseKey (PHKEY key);
+LSTATUS TmRegistryCloseKey (PHKEY key);
 
 /**
  * Retrieve data for the registry value associated with the given open registry key.
@@ -81,7 +81,7 @@ LSTATUS RegistryCloseKey (PHKEY key);
  * @return         other                 An error occurred querying the key. See the documentation
  *                                       for Win32 RegQueryValueExA() for more information.
  */
-LSTATUS RegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, LPDWORD size);
+LSTATUS TmRegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, LPDWORD size);
 
 /**
  * Retrieve a DWORD for a registry value associated with the given open registry key.
@@ -97,7 +97,7 @@ LSTATUS RegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, LPDWORD 
  * @return         other                 An error occurred querying the key. See the documentation
  *                                       for Win32 RegQueryValueEx() for more information.
  */
-LSTATUS RegistryQueryKeyDword (PHKEY key, LPCSTR value_name, LPDWORD data);
+LSTATUS TmRegistryQueryKeyDword (PHKEY key, LPCSTR value_name, LPDWORD data);
 
 /**
  * Set raw byte data for a registry value associated with the given open registry key.
@@ -113,7 +113,7 @@ LSTATUS RegistryQueryKeyDword (PHKEY key, LPCSTR value_name, LPDWORD data);
  * @return         other                 An error occurred setting the key. See the documentation
  *                                       for Win32 RegSetValueExA() for more information.
  */
-LSTATUS RegistrySetKeyRaw (PHKEY key, LPCSTR value_name, LPCBYTE data, DWORD size);
+LSTATUS TmRegistrySetKeyRaw (PHKEY key, LPCSTR value_name, LPCBYTE data, DWORD size);
 
 /**
  * Set a DWORD for a registry value associated with the given open registry key.
@@ -127,6 +127,6 @@ LSTATUS RegistrySetKeyRaw (PHKEY key, LPCSTR value_name, LPCBYTE data, DWORD siz
  * @return         other                 An error occurred setting the key. See the documentation
  *                                       for Win32 RegSetValueExA() for more information.
  */
-LSTATUS RegistrySetKeyDword (PHKEY key, LPCSTR value_name, DWORD data);
+LSTATUS TmRegistrySetKeyDword (PHKEY key, LPCSTR value_name, DWORD data);
 
 #endif /* TM_REGISTRY_H */

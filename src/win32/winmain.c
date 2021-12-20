@@ -6,10 +6,42 @@
 
 #include <windows.h>
 
-#include <registry/registry.h>
+#include "com/com.h"
+#include "fs/fs.h"
+#include "movie/movie.h"
+#include "registry/registry.h"
 
 static HMODULE tmLibHandle;  // @ 0x00BDFB28
 static TMWindow window;      // @ 0x00BDFCD0
+
+/**
+ * Register a Win32 window class with the specified parameters.
+ *
+ * @address        0x004A6B80
+ *
+ * @param[in]      name                Name of the window class.
+ * @param[in]      instance            Instance handle for the application.
+ * @param[in]      style               Window style.
+ * @param[in]      bg                  Window background.
+ *
+ * @return         ATOM                Handle for the window class.
+ */
+static ATOM RegisterWindowClass (LPCSTR name, HINSTANCE instance, UINT style, HBRUSH bg)
+{
+  WNDCLASSA wClass;
+
+  wClass.style = style;
+  wClass.hInstance = instance;
+  wClass.lpfnWndProc = DefWindowProcA;
+  wClass.cbClsExtra = NULL;
+  wClass.cbWndExtra = NULL;
+  wClass.hIcon = LoadIconA (instance, "GAME_ICON");
+  wClass.hCursor = LoadCursorA (NULL, IDC_ARROW);
+  wClass.hbrBackground = bg;
+  wClass.lpszMenuName = NULL;
+  wClass.lpszClassName = name;
+  return RegisterClassA (&wClass);
+}
 
 /**
  * Win32 entry point. Sets up various Windows-specific operations, then jumps to
@@ -28,21 +60,21 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
 {
   // Set up registry key "Software\Sony Entertainment\Twisted Metal 2\1.0.1"
   PHKEY reg_key;
-  RegistryInit ("Software\\Sony Interactive\\Twisted Metal 2\\1.0.1");
-  RegistryCreateKey (&reg_key, HKEY_LOCAL_MACHINE, NULL);
-  RegistryCloseKey (&reg_key);
+  TmRegistryInit ("Software\\Sony Interactive\\Twisted Metal 2\\1.0.1");
+  TmRegistryCreateKey (&reg_key, HKEY_LOCAL_MACHINE, NULL);
+  TmRegistryCloseKey (&reg_key);
 
   // Process arguments and get Display Capabilities (screen width, height, bits per pixel)
   TMEnvironment env;
   envInit (&env);  // @ 0x004C45C0
 
   // Test if the game is running from a CD Drive - save the drive letter in a global variable if so
-  findCdDrive ("tm2.ico");  // @ 0x00499884
+  TmFsGetCdDrive ("tm2.ico");  // @ 0x00499884
 
-  loadLibrary (&tmLibHandle, "TM2English");  // loadLibrary @ 0x004C4558
+  TmComLoadLibrary (&tmLibHandle, "TM2English");  // loadLibrary @ 0x004C4558
 
   // Open AVI video with the Windows MCI API
-  openAviVideo ();  // @ 0x004B9BF0
+  TmMovieInit ();  // @ 0x004B9BF0
 
   // Initialize Windows COM
   if (CoInitialize (NULL) < 0) {
@@ -64,10 +96,10 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
     int y = 48;
     SetRect (&rc, 0, 0, 640, 480);
     AdjustWindowRect (&rc, WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, FALSE);
-    RegistryOpenKey (&reg_key, HKEY_LOCAL_MACHINE, NULL);
-    RegistryQueryKeyDword (&reg_key, "Window XPos", &x);
-    RegistryQueryKeyDword (&reg_key, "Window YPos", &y);
-    RegistryCloseKey (&reg_key);
+    TmRegistryOpenKey (&reg_key, HKEY_LOCAL_MACHINE, NULL);
+    TmRegistryQueryKeyDword (&reg_key, "Window XPos", &x);
+    TmRegistryQueryKeyDword (&reg_key, "Window YPos", &y);
+    TmRegistryCloseKey (&reg_key);
     if (rc.right + x > env.screenWidth) {
       x = env.screenWidth - rc.right;
     }
@@ -88,9 +120,9 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
     // Initialize window with the expected class name, title bar name ("Twisted Metal 2"), position,
     // and size. Save the associated handles in a TMWindow struct
     windowInit (  // @ 0x004A6BE8
-        window, WS_EX_APPWINDOW, "Twisted Metal 2 Class", "Twisted Metal 2",
-        WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, x, y, rc.right, rc.bottom, NULL,
-        NULL, instance);
+      window, WS_EX_APPWINDOW, "Twisted Metal 2 Class", "Twisted Metal 2",
+      WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, x, y, rc.right, rc.bottom, NULL,
+      NULL, instance);
     windowShow (window, cmd_show);  // @ 0x004A6EE4
 
     // Boilerplate Win32 window setup

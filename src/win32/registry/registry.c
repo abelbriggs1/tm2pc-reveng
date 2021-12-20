@@ -8,8 +8,8 @@
 
 #include "registry.h"
 
-static char key_buffer[408];          // @ 0x00BDFB38
-static BOOL key_buffer_empty = TRUE;  // @ 0x004E8528
+static char key_buffer[408];          // @address 0x00BDFB38
+static BOOL key_buffer_empty = TRUE;  // @address 0x004E8528
 
 /**
  * Initialize the registry wrapper library by setting the name string for
@@ -32,7 +32,7 @@ static BOOL key_buffer_empty = TRUE;  // @ 0x004E8528
  * @return     1                   key_name was NULL, but the library had already been initialized
  *                                 before this call.
  */
-int RegistryInit (LPCSTR key_name)
+DWORD TmRegistryInit (LPCSTR key_name)
 {
   if (key_name) {
     lstrcpyA (key_buffer, key_name);
@@ -51,7 +51,7 @@ int RegistryInit (LPCSTR key_name)
  * Create a registry key with the given parameters, or open the key if it
  * already exists.
  *
- * If key_name is NULL, the key path set previously by RegistryInit() will be used.
+ * If key_name is NULL, the key path set previously by TmRegistryInit() will be used.
  *
  * @address        0x004AC550
  *
@@ -60,7 +60,7 @@ int RegistryInit (LPCSTR key_name)
  * @param[in]      key                 Handle for an open registry key.
  * @param[in]      key_name            Name of the subkey to create.
  */
-void RegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name)
+void TmRegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name)
 {
   if (key_name) {
     RegCreateKeyExA (key, key_name, NULL, NULL, NULL, KEY_ALL_ACCESS, NULL, result, NULL);
@@ -72,7 +72,7 @@ void RegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name)
 /**
  * Open a registry key.
  *
- * If key_name is NULL, the key path set previously by RegistryInit() will be used.
+ * If key_name is NULL, the key path set previously by TmRegistryInit() will be used.
  *
  * @address        0x004AC528
  *
@@ -85,7 +85,7 @@ void RegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name)
  * @return         other               An error occurred opening the key. See the documentation
  *                                     for Win32 RegOpenKeyExA() for more information.
  */
-LSTATUS RegistryOpenKey (PHKEY result, HKEY key, LPCSTR key_name)
+LSTATUS TmRegistryOpenKey (PHKEY result, HKEY key, LPCSTR key_name)
 {
   LSTATUS result;
 
@@ -107,7 +107,7 @@ LSTATUS RegistryOpenKey (PHKEY result, HKEY key, LPCSTR key_name)
  * @return         other               An error occurred closing the key. See the documentation
  *                                     for Win32 RegCloseKey() for more information.
  */
-LSTATUS RegistryCloseKey (PHKEY key)
+LSTATUS TmRegistryCloseKey (PHKEY key)
 {
   return RegCloseKey (key);
 }
@@ -134,7 +134,7 @@ LSTATUS RegistryCloseKey (PHKEY key)
  * @return         other                 An error occurred querying the key. See the documentation
  *                                       for Win32 RegQueryValueExA() for more information.
  */
-LSTATUS RegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, LPDWORD size)
+LSTATUS TmRegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, LPDWORD size)
 {
   return RegQueryValueExA (*key, value_name, NULL, NULL, data, size);
 }
@@ -155,7 +155,7 @@ LSTATUS RegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, LPDWORD 
  * @return         other                 An error occurred querying the key. See the documentation
  *                                       for Win32 RegQueryValueEx() for more information.
  */
-LSTATUS RegistryQueryKeyDword (PHKEY key, LPCSTR value_name, LPDWORD data)
+LSTATUS TmRegistryQueryKeyDword (PHKEY key, LPCSTR value_name, LPDWORD data)
 {
   DWORD dataSize = 4;
   return RegQueryValueExA (*key, value_name, NULL, NULL, data, &dataSize);
@@ -177,7 +177,7 @@ LSTATUS RegistryQueryKeyDword (PHKEY key, LPCSTR value_name, LPDWORD data)
  * @return         other                 An error occurred setting the key. See the documentation
  *                                       for Win32 RegSetValueExA() for more information.
  */
-LSTATUS RegistrySetKeyRaw (PHKEY key, LPCSTR value_name, LPCBYTE data, DWORD size)
+LSTATUS TmRegistrySetKeyRaw (PHKEY key, LPCSTR value_name, LPCBYTE data, DWORD size)
 {
   return RegSetValueExA (*key, value_name, NULL, REG_BINARY, data, size);
 }
@@ -196,7 +196,7 @@ LSTATUS RegistrySetKeyRaw (PHKEY key, LPCSTR value_name, LPCBYTE data, DWORD siz
  * @return         other                 An error occurred setting the key. See the documentation
  *                                       for Win32 RegSetValueExA() for more information.
  */
-LSTATUS RegistrySetKeyDword (PHKEY key, LPCSTR value_name, DWORD data)
+LSTATUS TmRegistrySetKeyDword (PHKEY key, LPCSTR value_name, DWORD data)
 {
   return RegSetValueExA (*key, value_name, NULL, REG_DWORD, data, sizeof (DWORD));
 }

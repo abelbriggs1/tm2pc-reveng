@@ -7,6 +7,9 @@
 #ifndef TM_ERROR_H
 #define TM_ERROR_H
 
+/**
+ * Error codes for various errors which can be passed to ErrorMessage().
+ */
 typedef enum {
   TM_ERROR_CD_DRIVE_LOCKED = 0,
   TM_ERROR_CD_DRIVE_ERROR = 1,
@@ -41,19 +44,17 @@ typedef enum {
   TM_ERROR_NET_PLAYER_ID_FAIL = 30,
   TM_ERROR_NET_NOT_AVAILABLE = 31,
   TM_ERROR_MAX
-} ErrorCode;
+} TmErrorCode;
 
 /**
  * Displays an error message to the user for the given error code and retrieves
  * the user's response.
- *
- * @address        0x004BC660
  *
  * @param[in]      code            Error code for the error.
  * @param[in]      ...             Variadic arguments for various error strings.
 
  * @return         int             Menu item value selected by the user in the Win32 message box.
  */
-int ErrorMessage (ErrorCode code, ...);
+int TmErrorMessage (TmErrorCode code, ...);
 
 #endif /* TM_ERROR_H */
