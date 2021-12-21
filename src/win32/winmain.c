@@ -7,12 +7,14 @@
 #include <windows.h>
 
 #include "com/com.h"
+#include "environment/environment.h"
 #include "fs/fs.h"
 #include "movie/movie.h"
 #include "registry/registry.h"
+#include "window/window.h"
 
-static HMODULE tmLibHandle;  // @ 0x00BDFB28
-static TMWindow window;      // @ 0x00BDFCD0
+static HMODULE tm_lib;   // @ 0x00BDFB28
+static TmWindow window;  // @ 0x00BDFCD0
 
 /**
  * Register a Win32 window class with the specified parameters.
@@ -65,16 +67,16 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
   TmRegistryCloseKey (&reg_key);
 
   // Process arguments and get Display Capabilities (screen width, height, bits per pixel)
-  TMEnvironment env;
-  envInit (&env);  // @ 0x004C45C0
+  TmEnvironment env;
+  TmEnvironmentInit (&env);  // @ 0x004C45C0
 
   // Test if the game is running from a CD Drive - save the drive letter in a global variable if so
-  TmFsGetCdDrive ("tm2.ico");  // @ 0x00499884
+  TmFsGetCdDrive ("tm2.ico");
 
-  TmComLoadLibrary (&tmLibHandle, "TM2English");  // loadLibrary @ 0x004C4558
+  TmComLoadLibrary (&tm_lib, "TM2English");
 
   // Open AVI video with the Windows MCI API
-  TmMovieInit ();  // @ 0x004B9BF0
+  TmMovieInit ();
 
   // Initialize Windows COM
   if (CoInitialize (NULL) < 0) {
@@ -84,8 +86,7 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
   // TODO: Is this Win32 structured exception handling?
   if (!setjmp ((jmp_buf*)0x00BDFAF0)) {
     // Detect CDROM, initialize paths to various resources from registry if possible
-    // This function returns 1 on success
-    int result = initPaths ("tm2.ico");  // @ 0x00498DDC
+    int result = TmFsInit ("tm2.ico");
     if (!result) {
       return !result;
     }
@@ -100,34 +101,33 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
     TmRegistryQueryKeyDword (&reg_key, "Window XPos", &x);
     TmRegistryQueryKeyDword (&reg_key, "Window YPos", &y);
     TmRegistryCloseKey (&reg_key);
-    if (rc.right + x > env.screenWidth) {
-      x = env.screenWidth - rc.right;
+    if (rc.right + x > env.screen_width) {
+      x = env.screen_width - rc.right;
     }
     if (x < 0) {
       x = 0;
     }
-    if (rc.bottom + y > env.screenHeight) {
-      y = env.screenHeight - rc.bottom;
+    if (rc.bottom + y > env.screen_height) {
+      y = env.screen_height - rc.bottom;
     }
     if (y < 0) {
       y = 0;
     }
 
     // Register window class with name "Twisted Metal 2 Class"
-    registerWindowClass ("Twisted Metal 2 Class", instance, CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW,
-                         NULL);  // @ 0x004A6B80
+    RegisterWindowClass ("Twisted Metal 2 Class", instance, CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW,
+                         NULL);
 
     // Initialize window with the expected class name, title bar name ("Twisted Metal 2"), position,
-    // and size. Save the associated handles in a TMWindow struct
-    windowInit (  // @ 0x004A6BE8
-      window, WS_EX_APPWINDOW, "Twisted Metal 2 Class", "Twisted Metal 2",
-      WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, x, y, rc.right, rc.bottom, NULL,
-      NULL, instance);
-    windowShow (window, cmd_show);  // @ 0x004A6EE4
+    // and size.
+    TmWindowInit (&window, WS_EX_APPWINDOW, "Twisted Metal 2 Class", "Twisted Metal 2",
+                  WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, x, y, rc.right,
+                  rc.bottom, NULL, NULL, instance);
+    TmWindowShow (&window, cmd_show);
 
     // Boilerplate Win32 window setup
     RECT rect;
-    HWND wnd = windowGetHwnd (window);  // @ 0x004A6DCC
+    HWND wnd = TmWindowGetHwnd (&window);
     HDC caps = GetDC (wnd);
     GetClientRect (wnd, &rect);
     FillRect (caps, &rect, GetStockObject (BLACK_BRUSH));

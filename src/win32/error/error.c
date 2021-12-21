@@ -251,7 +251,7 @@ int TmErrorMessage (TmErrorCode code, ...)
 
   wvsprintfA (text, error_table[code].text, arglist);
   ShowCursor (TRUE);
-  HWND curHwnd = windowGetHwndThunk ();  // @ 0x004A8F39, thunk for windowGetHwnd @ 0x004A6DCC
+  HWND curHwnd = TmWindowGetHwnd ();  // calls thunked version
   HGDIOBJ obj = GetStockObject (BLACK_BRUSH);
   DWORD prevLong = SetClassLongA (curHwnd, GCLP_HBRBACKGROUND, obj);
   int result = MessageBoxA (curHwnd, text, error_table[code].caption, error_table[code].type);
