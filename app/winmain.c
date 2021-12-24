@@ -6,12 +6,12 @@
 
 #include <windows.h>
 
-#include "com/com.h"
-#include "environment/environment.h"
-#include "fs/fs.h"
-#include "movie/movie.h"
-#include "registry/registry.h"
-#include "window/window.h"
+#include "win32/com.h"
+#include "win32/environment.h"
+#include "win32/fs.h"
+#include "win32/movie.h"
+#include "win32/registry.h"
+#include "win32/window.h"
 
 static HMODULE tm_lib;   // @ 0x00BDFB28
 static TmWindow window;  // @ 0x00BDFCD0

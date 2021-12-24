@@ -6,7 +6,7 @@
 
 #include <windows.h>
 
-#include "registry.h"
+#include "win32/registry.h"
 
 static char key_buffer[408];          // @address 0x00BDFB38
 static BOOL key_buffer_empty = TRUE;  // @address 0x004E8528

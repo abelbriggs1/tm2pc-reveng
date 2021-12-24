@@ -6,7 +6,7 @@
 
 #include <windows.h>
 
-#include "com.h"
+#include "win32/com.h"
 
 /**
  * Load a module into the address space of the process and return

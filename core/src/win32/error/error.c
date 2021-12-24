@@ -8,7 +8,7 @@
 
 #include <stdarg.h>
 
-#include "error.h"
+#include "win32/error.h"
 
 #define RETRY_YES (MB_ICONEXCLAMATION | MB_RETRYCANCEL)  // 0x35
 #define RETRY_NO (MB_ICONEXCLAMATION | MB_OK)            // 0x30

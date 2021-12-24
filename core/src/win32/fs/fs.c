@@ -6,10 +6,10 @@
 
 #include <windows.h>
 
-#include "error/error.h"
-#include "registry/registry.h"
+#include "win32/error.h"
+#include "win32/registry.h"
 
-#include "fs.h"
+#include "win32/fs.h"
 
 #define PATH_LEN 300
 

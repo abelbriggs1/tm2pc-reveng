@@ -6,7 +6,7 @@
 
 #include <windows.h>
 
-#include "movie.h"
+#include "win32/movie.h"
 
 static BOOL aviVideoOpen;  // @address 0x00C8511C
 

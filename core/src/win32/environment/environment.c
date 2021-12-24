@@ -6,7 +6,7 @@
 
 #include <windows.h>
 
-#include "environment.h"
+#include "win32/environment.h"
 
 /**
  * Get the Win32 command line string for the application, split
