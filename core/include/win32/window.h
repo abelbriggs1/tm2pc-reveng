@@ -56,6 +56,13 @@ void TmWindowInit (TmWindow* window,
                    HINSTANCE instance);
 
 /**
+ * Deinitialize the TmWindow and free its Win32 resources.
+ *
+ * @param[in,out]  window              Window context.
+ */
+void TmWindowDeinit (TmWindow* window);
+
+/**
  * Retrieve the Win32 window handle for the TmWindow.
  *
  * @param[in]      window              Window context.

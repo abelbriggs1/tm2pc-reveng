@@ -28,3 +28,25 @@ void TmComLoadLibrary (HMODULE* module, LPCSTR name)
   }
   *module = LoadLibraryA (name);
 }
+
+/**
+ * Free a module which was allocated into the address space of the
+ * process.
+ *
+ * @address        0x004C4584
+ *
+ * @param[in,out]  module              Pointer to a variable which holds the loaded module
+ *                                     handle to be freed.
+ *
+ * @return         nonzero             The module was successfully freed.
+ * @return         0                   *module was NULL, or the call to FreeLibrary() failed.
+ */
+BOOL TmComFreeLibrary (HMODULE* module)
+{
+  if (!*module) {
+    return FALSE;
+  }
+  BOOL result = FreeLibrary (*module);
+  *module = NULL;
+  return result;
+}

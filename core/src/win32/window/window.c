@@ -52,10 +52,33 @@ void TmWindowInit (TmWindow* window,
   window->hwnd = CreateWindowExA (ex_style, class_name, window_name, style, x, y, width, height,
                                   parent, window->menu, cur_instance, NULL);
   if (window->hwnd) {
-    window->wnd_info = GetWindowLong (window->hwnd, GWLP_WNDPROC);
+    window->wnd_info = GetWindowLongA (window->hwnd, GWLP_WNDPROC);
     SetWindowLongA (window->hwnd, GWLP_WNDPROC, window->wnd_proc);
     SetPropA (window->hwnd, "ST Object", window);
     window->msg_id = RegisterWindowMessageA ("QueryCancelAutoPlay");
+  }
+}
+
+/**
+ * Deinitialize the TmWindow and free its Win32 resources.
+ *
+ * @address        0x004A6C98
+ *
+ * @param[in,out]  window              Window context.
+ */
+void TmWindowDeinit (TmWindow* window)
+{
+  if (window->hwnd) {
+    ShowWindow (window->hwnd, SW_HIDE);
+    if (window->wnd_info && RemovePropA (window->hwnd, "ST Object")) {
+      SetWindowLongA (window->hwnd, GWLP_WNDPROC, window->wnd_info);
+    }
+    if (!GetParent (window->hwnd)) {
+      // We're the top level window, so the application is exiting.
+      PostQuitMessage (0);
+    }
+    DestroyWindow (window->hwnd);
+    window->hwnd = NULL;
   }
 }
 
