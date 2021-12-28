@@ -6,7 +6,7 @@
 
 #include <windows.h>
 
-#include "window.h"
+#include "win32/window.h"
 
 static HINSTANCE cur_instance;  // @address 0x00BDFAE8
 

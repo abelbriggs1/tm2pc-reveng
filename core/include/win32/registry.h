@@ -8,6 +8,18 @@
 #define TM_REGISTRY_H
 
 /**
+ * Macros to determine if a registry called succeeded or failed.
+ *
+ * Win32 provides SUCCEEDED() and FAILED() macros for COM errors, but the
+ * registry functions actually return System Error Codes. COM errors
+ * are defined to be negative on failure, but System Error Codes are
+ * actually positive. Thus, we can't use those macros for registry functions,
+ * and need to create our own.
+ */
+#define REG_SUCCEEDED(code) ((code == ERROR_SUCCESS))
+#define REG_FAILED(code) ((code != ERROR_SUCCESS))
+
+/**
  * Initialize the registry wrapper library by setting the name string for
  * the main TM2 registry key.
  *

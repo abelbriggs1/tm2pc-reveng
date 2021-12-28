@@ -80,7 +80,7 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
   TmMovieInit ();
 
   // Initialize Windows COM
-  if (CoInitialize (NULL) < 0) {
+  if (FAILED (CoInitialize (NULL))) {
     return 1;
   }
 
