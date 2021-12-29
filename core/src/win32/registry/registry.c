@@ -12,20 +12,14 @@ static char key_buffer[408];          // @address 0x00BDFB38
 static BOOL key_buffer_empty = TRUE;  // @address 0x004E8528
 
 /**
- * Initialize the registry wrapper library by setting the name string for
- * the main TM2 registry key.
+ * Initialize the registry wrapper library by setting the parent key to use
+ * for future registry function calls.
  *
- * If key is NULL, on the first call, the string will be set to "Software\SingleTrac\default".
- * On subsequent calls with key == NULL, an error code will be returned.
+ * If key_name is NULL, on the first call, the string will be set to
+ * "Software\SingleTrac\default". On subsequent calls with key_name == NULL,
+ * an error code will be returned.
  *
- * There are two versions of this function in the binary - the only difference appears
- * to be their return value. The first is only called by WinMain() and returns 1
- * if (!key && !key_buffer_empty), 0 otherwise. The other version is called in many places
- * across the binary and returns no value. For our purposes, we can simply document the
- * one used in WinMain.
- *
- * @address    0x004AC4B0
- *             0x004AC4E8
+ * @address    0x004AC4E8
  *
  * @param[in]  key_name            Name to use for the registry key.
  * @return     0                   The library was initialized.
@@ -45,6 +39,30 @@ DWORD TmRegistryInit (LPCSTR key_name)
     return 1;
   }
   return 0;
+}
+
+/**
+ * Set the parent registry key to use for future registry function calls.
+ *
+ * If key is NULL and the library was previously initialized
+ * (either by a call to this function or TmRegistryInit()), this function
+ * is a no-op.
+ *
+ * This function is identical in function to TmRegistryInit(), but does not
+ * return a value.
+ *
+ * @address    0x004AC4B0
+ *
+ * @param[in]  key_name            Name to use for the registry key.
+ */
+void TmRegistryUseKey (LPCSTR key_name)
+{
+  if (key_name) {
+    lstrcpyA (key_buffer, key_name);
+  } else if (key_buffer_empty) {
+    key_buffer_empty = FALSE;
+    lstrcpyA (key_buffer, "Software\\SingleTrac\\default");
+  }
 }
 
 /**
@@ -134,9 +152,9 @@ LSTATUS TmRegistryCloseKey (PHKEY key)
  * @return         other                 An error occurred querying the key. See the documentation
  *                                       for Win32 RegQueryValueExA() for more information.
  */
-LSTATUS TmRegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, LPDWORD size)
+LSTATUS TmRegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, DWORD size)
 {
-  return RegQueryValueExA (*key, value_name, NULL, NULL, data, size);
+  return RegQueryValueExA (*key, value_name, NULL, NULL, data, &size);
 }
 
 /**

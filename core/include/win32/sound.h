@@ -19,4 +19,11 @@ typedef struct {
   PHKEY reg_key;
 } TmSound;  // total size 0x1130 bytes
 
+/**
+ * Initialize the sound system.
+ *
+ * @param[in,out]  sound              Sound context.
+ */
+void TmSoundInit (TmSound* sound);
+
 #endif /* TM_SOUND_H */

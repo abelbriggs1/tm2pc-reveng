@@ -23,6 +23,12 @@ typedef struct {
 } TmWindow;
 
 /**
+ * Global window structure for usage with other modules. Initialized
+ * in WinMain().
+ */
+extern TmWindow global_window;
+
+/**
  * Initialize a TmWindow with the specified parameters.
  *
  * @param[in,out]  window              Window context.

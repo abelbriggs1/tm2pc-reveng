@@ -4,7 +4,7 @@
  * Sound processing functions.
  */
 
-#include "windows.h"
+#include <windows.h>
 
 #include "win32/registry.h"
 

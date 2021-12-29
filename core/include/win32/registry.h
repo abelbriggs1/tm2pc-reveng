@@ -20,11 +20,12 @@
 #define REG_FAILED(code) ((code != ERROR_SUCCESS))
 
 /**
- * Initialize the registry wrapper library by setting the name string for
- * the main TM2 registry key.
+ * Initialize the registry wrapper library by setting the parent key to use
+ * for future registry function calls.
  *
- * If key is NULL, on the first call, the string will be set to "Software\SingleTrac\default".
- * On subsequent calls with key == NULL, an error code will be returned.
+ * If key_name is NULL, on the first call, the string will be set to
+ * "Software\SingleTrac\default". On subsequent calls with key_name == NULL,
+ * an error code will be returned.
  *
  * @param[in]  key_name            Name to use for the registry key.
  * @return     0                   The library was initialized.
@@ -32,6 +33,17 @@
  *                                 before this call.
  */
 DWORD TmRegistryInit (LPCSTR key_name);
+
+/**
+ * Set the parent registry key to use for future registry function calls.
+ *
+ * If key is NULL and the library was previously initialized
+ * (either by a call to this function or TmRegistryInit()), this function
+ * is a no-op.
+ *
+ * @param[in]  key_name            Name to use for the registry key.
+ */
+void TmRegistryUseKey (LPCSTR key_name);
 
 /**
  * Create a registry key with the given parameters, or open the key if it

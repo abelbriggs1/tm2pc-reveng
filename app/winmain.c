@@ -13,8 +13,9 @@
 #include "win32/registry.h"
 #include "win32/window.h"
 
-static HMODULE tm_lib;   // @address 0x00BDFB28
-static TmWindow window;  // @address 0x00BDFCD0
+TmWindow global_window;  // @address 0x00BDFCD0
+
+static HMODULE tm_lib;  // @address 0x00BDFB28
 
 /**
  * Register a Win32 window class with the specified parameters.
@@ -63,6 +64,7 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
   RECT rc;
   // Set up registry key "Software\Sony Entertainment\Twisted Metal 2\1.0.1"
   PHKEY reg_key;
+  TmRegistryUseKey (NULL);
   TmRegistryInit ("Software\\Sony Interactive\\Twisted Metal 2\\1.0.1");
   TmRegistryCreateKey (&reg_key, HKEY_LOCAL_MACHINE, NULL);
   TmRegistryCloseKey (&reg_key);
