@@ -20,7 +20,7 @@
  *                                     the given module name.
  * @param[in]      name                Name of the module to load.
  */
-void TmComLoadLibrary (HMODULE* module, LPCSTR name)
+VOID TmComLoadLibrary (HMODULE* module, LPCSTR name)
 {
   if (*module) {
     FreeLibrary (*module);

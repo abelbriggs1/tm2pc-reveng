@@ -16,7 +16,7 @@
  *
  * @param[in,out]  renderer            Renderer context.
  */
-void CreateClipper (TmRenderer* renderer)
+VOID CreateClipper (TmRenderer* renderer)
 {
   HRESULT result;
   if (renderer->unk_ddclipper) {
@@ -51,7 +51,7 @@ void CreateClipper (TmRenderer* renderer)
  *
  * @param[in,out]  renderer            Renderer context.
  */
-void ReleaseClipper (TmRenderer* renderer)
+VOID ReleaseClipper (TmRenderer* renderer)
 {
   LPDIRECTDRAWCLIPPER clipper;
 

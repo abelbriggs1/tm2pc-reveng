@@ -17,7 +17,7 @@
  *
  * @param[in,out]  env                 Environment structure.
  */
-static void SplitCmdArgs (TmEnvironment* env)
+static VOID SplitCmdArgs (TmEnvironment* env)
 {
   LPSTR cmd_str = GetCommandLineA ();
   BOOL quote = FALSE;
@@ -61,7 +61,7 @@ static void SplitCmdArgs (TmEnvironment* env)
  *
  * @param[in,out]  env                 Environment structure.
  */
-void TmEnvironmentInit (TmEnvironment* env)
+VOID TmEnvironmentInit (TmEnvironment* env)
 {
   SplitCmdArgs (env);
 
@@ -74,7 +74,7 @@ void TmEnvironmentInit (TmEnvironment* env)
     path++;
   }
   // Cut off the end of the string with the executable name - gives us path to executable
-  for (LPSTR i = path[len]; (len > 0 && *i != '\\'); i--) {
+  for (LPSTR i = &path[len]; (len > 0 && *i != '\\'); i--) {
     len--;
   }
   qmemcpy (env->exec_path, path, len);

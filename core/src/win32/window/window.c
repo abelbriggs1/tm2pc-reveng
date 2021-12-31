@@ -32,15 +32,15 @@ static HINSTANCE cur_instance;  // @address 0x00BDFAE8
  * @param[in]      instance            Handle to an instance to be associated with the window.
  *                                     Optional.
  */
-void TmWindowInit (TmWindow* window,
+VOID TmWindowInit (TmWindow* window,
                    DWORD ex_style,
                    LPCSTR class_name,
                    LPCSTR window_name,
                    DWORD style,
-                   int x,
-                   int y,
-                   int width,
-                   int height,
+                   DWORD x,
+                   DWORD y,
+                   DWORD width,
+                   DWORD height,
                    HINSTANCE parent,
                    LPCSTR menu_name,
                    HINSTANCE instance)
@@ -66,7 +66,7 @@ void TmWindowInit (TmWindow* window,
  *
  * @param[in,out]  window              Window context.
  */
-void TmWindowDeinit (TmWindow* window)
+VOID TmWindowDeinit (TmWindow* window)
 {
   if (window->hwnd) {
     ShowWindow (window->hwnd, SW_HIDE);

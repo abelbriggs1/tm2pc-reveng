@@ -6,7 +6,7 @@
 
 #include "renderer_internal.h"
 
-static int surface_ref_count = 0;  // @address 0x00C85004
+static DWORD surface_ref_count = 0;  // @address 0x00C85004
 
 static HRESULT UnkLoadingFunc ()
 {  // @address 0x00497390
@@ -55,10 +55,10 @@ static HRESULT UnkLoadingFunc ()
  */
 HRESULT CreateSurface (TmRenderer* renderer,
                        LPDIRECTDRAWSURFACE2 surface,
-                       int width,
-                       int height,
-                       int caps,
-                       int back_buffer_count)
+                       DWORD width,
+                       DWORD height,
+                       DWORD caps,
+                       DWORD back_buffer_count)
 {
   // TODO: DDSURFACEDESC or DDSURFACEDESC2? IDA struggles to decompile
   // this function.
@@ -93,7 +93,7 @@ HRESULT CreateSurface (TmRenderer* renderer,
  *
  * @param[in,out]  renderer            Renderer context.
  */
-void ReleaseSurfaces (TmRenderer* renderer)
+VOID ReleaseSurfaces (TmRenderer* renderer)
 {
   // NB: result is undefined in this function if neither if statement
   // is hit.
@@ -159,7 +159,7 @@ HRESULT RestoreSurfaces (TmRenderer* renderer)
  *                                     was uninitialized.
  * @return         others              Error code from DirectDraw fill operation.
  */
-HRESULT FillSurface (TmRenderer* renderer, int color, LPDIRECTDRAWSURFACE2 surface)
+HRESULT FillSurface (TmRenderer* renderer, DWORD color, LPDIRECTDRAWSURFACE2 surface)
 {
   if (!surface) {
     surface = renderer->membuffer_surface;

@@ -36,38 +36,38 @@ DEFINE_GUID (IID_IDirect3DHALDevice,
              0x6E);
 
 typedef struct {
-  int shade_mode;
-  int fill_mode;
-  int unk1;
-  int unk2;
-  int unk_render_state1;
-  int dither_mode;
-  int unk_render_state2;
-  int specular_enable;
-  int zbuf_enable;
-  int zbuf_write_enable;
-  int zbuf_func;
-  int dest_blend;
-  int unk_render_state3;
-  int alpha_blend_enable;
-  int unk3;
-  int unk4;
-  int unk5;
-  int unk6;
-  int unk7;
-  int unk8;
-  int unk9;
-  int unk10;
-  int unk11;
-  int unk12;
-  int unk13;
-  int unk14;
-  int unk15;
+  DWORD shade_mode;
+  DWORD fill_mode;
+  DWORD unk1;
+  DWORD unk2;
+  DWORD unk_render_state1;
+  DWORD dither_mode;
+  DWORD unk_render_state2;
+  DWORD specular_enable;
+  DWORD zbuf_enable;
+  DWORD zbuf_write_enable;
+  DWORD zbuf_func;
+  DWORD dest_blend;
+  DWORD unk_render_state3;
+  DWORD alpha_blend_enable;
+  DWORD unk3;
+  DWORD unk4;
+  DWORD unk5;
+  DWORD unk6;
+  DWORD unk7;
+  DWORD unk8;
+  DWORD unk9;
+  DWORD unk10;
+  DWORD unk11;
+  DWORD unk12;
+  DWORD unk13;
+  DWORD unk14;
+  DWORD unk15;
 } Renderer3dProperties;  // total size 0x6C bytes
 
-int unk_renderer_init_flag;  // @address 0x00C85008
+DWORD unk_renderer_init_flag;  // @address 0x00C85008
 
-static int coop_level;                          // @address 0x004E86AC
+static DWORD coop_level;                        // @address 0x004E86AC
 static Renderer3dProperties renderer_3d_props;  // @address 0x00C84F74
 static DisplayCapabilities display_caps;        // @address 0x00C848E0
 static UnkTextureStruct textures[512];          // @address 0x00A2DC48
@@ -79,7 +79,7 @@ static UnkTextureStruct textures[512];          // @address 0x00A2DC48
  *
  * @param[in,out]  renderer            Renderer context.
  */
-static void ReleaseHalDevice (TmRenderer* renderer)
+static VOID ReleaseHalDevice (TmRenderer* renderer)
 {
   if (renderer->background) {
     IDirect3DMaterial2_Release (renderer->background);
@@ -108,7 +108,7 @@ static void ReleaseHalDevice (TmRenderer* renderer)
  *
  * @address        0x00497828
  */
-static void ReleaseUnkTextureStructs ()
+static VOID ReleaseUnkTextureStructs ()
 {
   for (int i = 0; i < ARRAY_SIZE (textures); i++) {
     if (textures[i].unk1) {
@@ -128,10 +128,10 @@ static void ReleaseUnkTextureStructs ()
  * @param[in,out]  renderer           Renderer context.
  *
  */
-static void CreateBackbufferSurface (TmRenderer* renderer)
+static VOID CreateBackbufferSurface (TmRenderer* renderer)
 {
   HRESULT result;
-  int surface_caps;
+  DWORD surface_caps;
 
   // We try three times to create our surfaces, using various options for compatibility
   // reasons.
@@ -200,11 +200,11 @@ static void CreateBackbufferSurface (TmRenderer* renderer)
  *
  * @param[in,out]  renderer            Renderer context.
  */
-static void CreatePrimaryAndMembufferSurfaces (TmRenderer* renderer)
+static VOID CreatePrimaryAndMembufferSurfaces (TmRenderer* renderer)
 {
   HRESULT result;
 
-  int caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
+  DWORD caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
   caps |= DDSCAPS_PRIMARYSURFACE;
   result = CreateSurface (renderer, renderer->primary_surface, 0, 0, caps, 0);
   if (FAILED (result)) {
@@ -214,7 +214,7 @@ static void CreatePrimaryAndMembufferSurfaces (TmRenderer* renderer)
     RaiseException (0, 0, 0, NULL);
   }
 
-  int caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
+  caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
   caps |= DDSCAPS_SYSTEMMEMORY;
   result = CreateSurface (renderer, renderer->membuffer_surface, renderer->width, renderer->height,
                           caps, 0);
@@ -281,7 +281,7 @@ static HRESULT InitDirect3d (TmRenderer* renderer)
  * @return         DD_OK                     The renderer was initialized successfully.
  * @return         others                    An error occurred during initialization.
  */
-HRESULT TmRendererInit (TmRenderer* renderer, int unknown_renderer_flag)
+HRESULT TmRendererInit (TmRenderer* renderer, DWORD unknown_renderer_flag)
 {
   if (!renderer->ddraw2) {
     renderer->hwnd = TmWindowGetHwnd (&global_window);
@@ -509,9 +509,9 @@ HRESULT TmRendererRenderFrame (TmRenderer* renderer)
  *
  * @param[in]      renderer            Renderer context.
  *
- * @return         int                 Display width, in pixels.
+ * @return         DWORD               Display width, in pixels.
  */
-int TmRendererGetDisplayWidth (TmRenderer* renderer)
+DWORD TmRendererGetDisplayWidth (TmRenderer* renderer)
 {
   return renderer->width;
 }
@@ -523,9 +523,9 @@ int TmRendererGetDisplayWidth (TmRenderer* renderer)
  *
  * @param[in]      renderer            Renderer context.
  *
- * @return         int                 Display height, in pixels.
+ * @return         DWORD               Display height, in pixels.
  */
-int TmRendererGetDisplayHeight (TmRenderer* renderer)
+DWORD TmRendererGetDisplayHeight (TmRenderer* renderer)
 {
   return renderer->height;
 }
@@ -538,7 +538,7 @@ int TmRendererGetDisplayHeight (TmRenderer* renderer)
  * @param[in,out]  renderer            Renderer context.
  * @param[in]      bltfx               Pointer to DirectDraw BLT effects object.
  */
-void TmRendererSetBltfx (TmRenderer* renderer, LPDDBLTFX bltfx)
+VOID TmRendererSetBltfx (TmRenderer* renderer, LPDDBLTFX bltfx)
 {
   renderer->bltfx = bltfx;
 }
@@ -597,7 +597,7 @@ HRESULT TmRendererReleaseSurfaceDeviceContext (TmRenderer* renderer,
  *
  * @param[in,out]  renderer            Renderer context.
  */
-void TmRendererDisplay (TmRenderer* renderer)
+VOID TmRendererDisplay (TmRenderer* renderer)
 {
   HRESULT result;
   renderer->unk_enum_val2 = 1;

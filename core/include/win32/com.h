@@ -17,7 +17,7 @@
  *                                     the given module name.
  * @param[in]      name                Name of the module to load.
  */
-void TmComLoadLibrary (HMODULE* module, LPCSTR name);
+VOID TmComLoadLibrary (HMODULE* module, LPCSTR name);
 
 /**
  * Free a module which was allocated into the address space of the

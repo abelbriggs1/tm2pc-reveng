@@ -41,7 +41,7 @@ typedef struct {
  *
  * @param[in,out]  sound               Sound context.
  */
-static void MixerUseDefaultVolume (TmSound* sound)
+static VOID MixerUseDefaultVolume (TmSound* sound)
 {
   sound->game_vol[0].waveout_vol = DEFAULT_VOLUME_WAVE_UNSIGNED;
   sound->game_vol[0].cd_vol = DEFAULT_VOLUME_CD_UNSIGNED;
@@ -66,7 +66,7 @@ static void MixerUseDefaultVolume (TmSound* sound)
  *
  * @param[in,out]  sound               Sound context.
  */
-static void MixerInit (TmSound* sound)
+static VOID MixerInit (TmSound* sound)
 {
   MIXERLINEA mixer;
   MIXERCONTROLA ctrl;
@@ -124,7 +124,7 @@ static void MixerInit (TmSound* sound)
  * @param[in]      component_type      Win32 MIXERLINE volume type value.
  * @param[in]      volume              Volume as an unsigned 16-bit integer.
  */
-static void MixerUpdateComponentVolume (TmSound* sound, DWORD component_type, DWORD volume)
+static VOID MixerUpdateComponentVolume (TmSound* sound, DWORD component_type, DWORD volume)
 {
   MIXERLINEA mixer;
   MIXERCONTROLDETAILS details;
@@ -146,7 +146,7 @@ static void MixerUpdateComponentVolume (TmSound* sound, DWORD component_type, DW
     }
   }
 
-  int pamx;
+  DWORD pamx;
   controls.dwLineID = mixer.dwLineID;
   controls.cControls = mixer.cControls;
   controls.cbmxctrl = sizeof (MIXERCONTROLA);
@@ -172,7 +172,7 @@ static void MixerUpdateComponentVolume (TmSound* sound, DWORD component_type, DW
  * @param[in]      use_game_vol        TRUE to update with game volume,
  *                                     FALSE to update with user-provided volume.
  */
-static void MixerUpdateVolume (TmSound* sound, int use_game_vol)
+static VOID MixerUpdateVolume (TmSound* sound, DWORD use_game_vol)
 {
   MMRESULT result;
 
@@ -200,7 +200,7 @@ static void MixerUpdateVolume (TmSound* sound, int use_game_vol)
     mixer.dwComponentType = MIXERLINE_COMPONENTTYPE_DST_SPEAKERS;
     result = mixerGetLineInfoA (sound->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE);
     if (MM_SUCCEEDED (result)) {
-      int pamx;
+      DWORD pamx;
       controls.dwLineID = mixer.dwLineID;
       controls.cbStruct = sizeof (MIXERLINECONTROLSA);
       controls.cControls = mixer.cControls;
@@ -230,7 +230,7 @@ static void MixerUpdateVolume (TmSound* sound, int use_game_vol)
     mixer.dwComponentType = MIXERLINE_COMPONENTTYPE_DST_SPEAKERS;
     result = mixerGetLineInfoA (sound->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE);
     if (MM_SUCCEEDED (result)) {
-      int pamx;
+      DWORD pamx;
       controls.dwLineID = mixer.dwLineID;
       controls.cbStruct = sizeof (MIXERLINECONTROLSA);
       controls.cControls = mixer.cControls;
@@ -262,7 +262,7 @@ static void MixerUpdateVolume (TmSound* sound, int use_game_vol)
  *
  * @param[in,out]  sound              Sound context.
  */
-void TmSoundInit (TmSound* sound)
+VOID TmSoundInit (TmSound* sound)
 {
   sound->hwnd = TmWindowGetHwnd ();  // thunk 0x004A8F34
   TmRegistryOpenKey (sound->reg_key, HKEY_LOCAL_MACHINE, 0);

@@ -10,21 +10,21 @@ typedef struct {
 } DisplayDescriptors;
 
 typedef struct {
-  int width;
-  int height;
-  int rgb_bit_count;
-  int monitor_freq;
+  DWORD width;
+  DWORD height;
+  DWORD rgb_bit_count;
+  DWORD monitor_freq;
 } DisplayMode;
 
 typedef struct {
-  int count;
+  DWORD count;
   DisplayMode modes[30];
   DDCAPS_DX5 hw_caps;
   DDCAPS_DX5 hel_caps;
-  int hw_supports_3d;
-  int hw_bank_switched;
-  int hw_blt_stretched;
-  int hw_no_2d_during_3d_scene;
+  DWORD hw_supports_3d;
+  DWORD hw_bank_switched;
+  DWORD hw_blt_stretched;
+  DWORD hw_no_2d_during_3d_scene;
   DisplayDescriptors descriptors;
 } DisplayCapabilities;
 

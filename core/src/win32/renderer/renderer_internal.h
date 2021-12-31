@@ -27,6 +27,6 @@
 #include "texture.h"
 
 // Defined in renderer.c
-extern int unk_renderer_init_flag;
+extern DWORD unk_renderer_init_flag;
 
 #endif /* TM_RENDERER_INTERNAL_H */

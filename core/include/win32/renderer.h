@@ -8,37 +8,37 @@
 #define TM_RENDERER_H
 
 typedef struct {
-  int display_mode_index;  // unknown type
+  DWORD display_mode_index;  // unknown type
   LPDIRECTDRAW display_driver;
   LPDIRECTDRAW2 ddraw2;
   LPDIRECTDRAWSURFACE2 primary_surface;
   LPDIRECTDRAWSURFACE2 backbuffer_surface;
   LPDIRECTDRAWSURFACE2 membuffer_surface;
-  int unk1;  // unknown 32-bit field
-  int unk2;  // unknown 32-bit field
+  DWORD unk1;  // unknown 32-bit field
+  DWORD unk2;  // unknown 32-bit field
   LPDIRECTDRAWCLIPPER unk_ddclipper;
   LPDIRECT3D2 d3d2;
   LPDIRECT3DDEVICE2 hal_device;
   LPDIRECT3DVIEWPORT2 viewport;
-  int unk3;  // unknown pointer to D3D/DDRAW object
+  DWORD unk3;  // unknown pointer to D3D/DDRAW object
   GUID d3d_hal_device_guid;
   LPDIRECT3DMATERIAL2 background;
   LPDIRECT3DMATERIAL2 unk_material;
   D3DMATERIALHANDLE unk_material_handle;
   DWORD renderer_id;
   HWND hwnd;
-  int width;
-  int height;
-  int unk4;                  // unknown 32-bit field
-  int maybe_bits_per_pixel;  // unknown type/meaning
-  int monitor_freq;
+  DWORD width;
+  DWORD height;
+  DWORD unk4;                  // unknown 32-bit field
+  DWORD maybe_bits_per_pixel;  // unknown type/meaning
+  DWORD monitor_freq;
   LPDDBLTFX bltfx;
-  int unk_enum_val2;  // unknown 32-bit field
-  int unk_enum_val;   // unknown 32-bit field
+  DWORD unk_enum_val2;  // unknown 32-bit field
+  DWORD unk_enum_val;   // unknown 32-bit field
   RECT rect;
-  int maybe_bits_per_pixel2;  // unknown type/meaning
-  int unk5;                   // unknown 32-bit field
-  int cursor_visible;
+  DWORD maybe_bits_per_pixel2;  // unknown type/meaning
+  DWORD unk5;                   // unknown 32-bit field
+  DWORD cursor_visible;
 } TmRenderer;
 
 /**
@@ -50,25 +50,25 @@ typedef struct {
  * @return         DD_OK                     The renderer was initialized successfully.
  * @return         others                    An error occurred during initialization.
  */
-HRESULT TmRendererInit (TmRenderer* renderer, int unknown_renderer_flag);
+HRESULT TmRendererInit (TmRenderer* renderer, DWORD unknown_renderer_flag);
 
 /**
  * Get the current display width.
  *
  * @param[in]      renderer            Renderer context.
  *
- * @return         int                 Display width, in pixels.
+ * @return         DWORD               Display width, in pixels.
  */
-int TmRendererGetDisplayWidth (TmRenderer* renderer);
+DWORD TmRendererGetDisplayWidth (TmRenderer* renderer);
 
 /**
  * Get the current display height.
  *
  * @param[in]      renderer            Renderer context.
  *
- * @return         int                 Display height, in pixels.
+ * @return         DWORD               Display height, in pixels.
  */
-int TmRendererGetDisplayHeight (TmRenderer* renderer);
+DWORD TmRendererGetDisplayHeight (TmRenderer* renderer);
 
 /**
  * Set the effects for the renderer to use on bit block transfers.
@@ -76,7 +76,7 @@ int TmRendererGetDisplayHeight (TmRenderer* renderer);
  * @param[in,out]  renderer            Renderer context.
  * @param[in]      bltfx               Pointer to DirectDraw BLT effects object.
  */
-void TmRendererSetBltfx (TmRenderer* renderer, LPDDBLTFX bltfx);
+VOID TmRendererSetBltfx (TmRenderer* renderer, LPDDBLTFX bltfx);
 
 /**
  * Get the device context for a DirectDraw surface.
@@ -105,5 +105,15 @@ HRESULT TmRendererGetSurfaceDeviceContext (TmRenderer* renderer,
 HRESULT TmRendererReleaseSurfaceDeviceContext (TmRenderer* renderer,
                                                HDC hdc,
                                                LPDIRECTDRAWSURFACE2 surface);
+
+/**
+ * Change display modes and prepare to render frames to the window.
+ *
+ * On error, this function raises structured exceptions which the caller
+ * must handle.
+ *
+ * @param[in,out]  renderer            Renderer context.
+ */
+VOID TmRendererDisplay (TmRenderer* renderer);
 
 #endif /* TM_RENDERER_H */

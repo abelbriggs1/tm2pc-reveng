@@ -8,7 +8,7 @@
 
 #include "win32/registry.h"
 
-static char key_buffer[408];          // @address 0x00BDFB38
+static CHAR key_buffer[408];          // @address 0x00BDFB38
 static BOOL key_buffer_empty = TRUE;  // @address 0x004E8528
 
 /**
@@ -55,7 +55,7 @@ DWORD TmRegistryInit (LPCSTR key_name)
  *
  * @param[in]  key_name            Name to use for the registry key.
  */
-void TmRegistryUseKey (LPCSTR key_name)
+VOID TmRegistryUseKey (LPCSTR key_name)
 {
   if (key_name) {
     lstrcpyA (key_buffer, key_name);
@@ -78,7 +78,7 @@ void TmRegistryUseKey (LPCSTR key_name)
  * @param[in]      key                 Handle for an open registry key.
  * @param[in]      key_name            Name of the subkey to create.
  */
-void TmRegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name)
+VOID TmRegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name)
 {
   if (key_name) {
     RegCreateKeyExA (key, key_name, NULL, NULL, NULL, KEY_ALL_ACCESS, NULL, result, NULL);

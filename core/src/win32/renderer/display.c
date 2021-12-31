@@ -26,7 +26,7 @@ HRESULT EnumDisplayModesCallback (LPDDSURFACEDESC2 desc, LPVOID internal)
   DisplayCapabilities* caps = (DisplayCapabilities*)internal;
 
   if (desc->ddpfPixelFormat.dwRGBBitCount == 16) {
-    int max_width = unk_renderer_init_flag ? 800 : 640;
+    DWORD max_width = unk_renderer_init_flag ? 800 : 640;
     if (max_width >= desc->dwWidth) {
       caps->modes[caps->count].width = desc->dwWidth;
       caps->modes[caps->count].height = desc->dwHeight;

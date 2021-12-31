@@ -15,10 +15,10 @@ typedef struct {
   int num_args;
   LPSTR cmd_args[10];
   CHAR exec_path[400];
-  char pad[4];  // unknown if padding or variable
-  int screen_width;
-  int screen_height;
-  int bits_per_pixel;
+  CHAR pad[4];  // unknown if padding or variable
+  DWORD screen_width;
+  DWORD screen_height;
+  DWORD bits_per_pixel;
 } TmEnvironment;
 
 /**
@@ -27,7 +27,7 @@ typedef struct {
 
  * @param[in,out]  env                 Environment structure.
  */
-void TmEnvironmentInit (TmEnvironment* env);
+VOID TmEnvironmentInit (TmEnvironment* env);
 
 /**
  * Retrieve the command line arguments.

@@ -43,7 +43,7 @@ DWORD TmRegistryInit (LPCSTR key_name);
  *
  * @param[in]  key_name            Name to use for the registry key.
  */
-void TmRegistryUseKey (LPCSTR key_name);
+VOID TmRegistryUseKey (LPCSTR key_name);
 
 /**
  * Create a registry key with the given parameters, or open the key if it
@@ -56,7 +56,7 @@ void TmRegistryUseKey (LPCSTR key_name);
  * @param[in]      key                 Handle for an open registry key.
  * @param[in]      key_name            Name of the subkey to create.
  */
-void TmRegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name);
+VOID TmRegistryCreateKey (PHKEY result, HKEY key, LPCSTR key_name);
 
 /**
  * Open a registry key.

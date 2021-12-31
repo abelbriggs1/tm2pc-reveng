@@ -6,12 +6,12 @@
 
 typedef struct {
   // TODO: These are pointers to D3D types.
-  int unk1;
-  int unk2;
-  int unk3;
-  int unk4;
-  int unk5;
-  int unk6;
+  DWORD unk1;
+  DWORD unk2;
+  DWORD unk3;
+  DWORD unk4;
+  DWORD unk5;
+  DWORD unk6;
 } UnkTextureStruct;
 
 /**
@@ -19,4 +19,4 @@ typedef struct {
  *
  * @param[in,out]  texture             Texture to release.
  */
-void ReleaseUnkTextureStruct (UnkTextureStruct* texture);
+VOID ReleaseUnkTextureStruct (UnkTextureStruct* texture);

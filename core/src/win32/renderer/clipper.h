@@ -13,13 +13,13 @@
  *
  * @param[in,out]  renderer            Renderer context.
  */
-void CreateClipper (TmRenderer* renderer);
+VOID CreateClipper (TmRenderer* renderer);
 
 /**
  * Release the clipper object for the primary surface, if it exists.
  *
  * @param[in,out]  renderer            Renderer context.
  */
-void ReleaseClipper (TmRenderer* renderer);
+VOID ReleaseClipper (TmRenderer* renderer);
 
 #endif /* TM_CLIPPER_H */

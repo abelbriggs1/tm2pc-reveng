@@ -97,8 +97,8 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
     }
 
     // Calculate main window size and location (default size 640x480)
-    int x = 48;
-    int y = 48;
+    DWORD x = 48;
+    DWORD y = 48;
     SetRect (&rc, 0, 0, 640, 480);
     AdjustWindowRect (&rc, WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, FALSE);
     TmRegistryOpenKey (&reg_key, HKEY_LOCAL_MACHINE, NULL);
@@ -124,14 +124,14 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
 
     // Initialize window with the expected class name, title bar name ("Twisted Metal 2"), position,
     // and size.
-    TmWindowInit (&window, WS_EX_APPWINDOW, "Twisted Metal 2 Class", "Twisted Metal 2",
+    TmWindowInit (&global_window, WS_EX_APPWINDOW, "Twisted Metal 2 Class", "Twisted Metal 2",
                   WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, x, y, rc.right,
                   rc.bottom, NULL, NULL, instance);
-    TmWindowShow (&window, cmd_show);
+    TmWindowShow (&global_window, cmd_show);
 
     // Boilerplate Win32 window setup
     RECT rect;
-    HWND wnd = TmWindowGetHwnd (&window);
+    HWND wnd = TmWindowGetHwnd (&global_window);
     HDC caps = GetDC (wnd);
     GetClientRect (wnd, &rect);
     FillRect (caps, &rect, GetStockObject (BLACK_BRUSH));
@@ -147,7 +147,7 @@ int WinMain (HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cm
       TmRegistrySetKeyDword (&reg_key, "Window YPos", rc.top);
       TmRegistryCloseKey (&reg_key);
     }
-    TmWindowDeinit (&window);
+    TmWindowDeinit (&global_window);
     ClipCursor (NULL);
     CoUninitialize ();
     TmComFreeLibrary (&tm_lib);

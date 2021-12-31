@@ -20,7 +20,7 @@
  *
  * @param[in,out]  texture             Texture to release.
  */
-void ReleaseUnkTextureStruct (UnkTextureStruct* texture)
+VOID ReleaseUnkTextureStruct (UnkTextureStruct* texture)
 {
   // TODO: This function will need to be combed once UnkTextureStruct
   // has been filled with the proper types. The current implementation

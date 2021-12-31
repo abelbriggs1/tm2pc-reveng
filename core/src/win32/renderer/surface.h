@@ -19,17 +19,17 @@
  */
 HRESULT CreateSurface (TmRenderer* renderer,
                        LPDIRECTDRAWSURFACE2 surface,
-                       int width,
-                       int height,
-                       int caps,
-                       int back_buffer_count);
+                       DWORD width,
+                       DWORD height,
+                       DWORD caps,
+                       DWORD back_buffer_count);
 
 /**
  * Release the renderer's DirectDraw surfaces.
  *
  * @param[in,out]  renderer            Renderer context.
  */
-void ReleaseSurfaces (TmRenderer* renderer);
+VOID ReleaseSurfaces (TmRenderer* renderer);
 
 /**
  * Restore the renderer's DirectDraw surfaces if they are lost.
