@@ -52,4 +52,58 @@ typedef struct {
  */
 HRESULT TmRendererInit (TmRenderer* renderer, int unknown_renderer_flag);
 
+/**
+ * Get the current display width.
+ *
+ * @param[in]      renderer            Renderer context.
+ *
+ * @return         int                 Display width, in pixels.
+ */
+int TmRendererGetDisplayWidth (TmRenderer* renderer);
+
+/**
+ * Get the current display height.
+ *
+ * @param[in]      renderer            Renderer context.
+ *
+ * @return         int                 Display height, in pixels.
+ */
+int TmRendererGetDisplayHeight (TmRenderer* renderer);
+
+/**
+ * Set the effects for the renderer to use on bit block transfers.
+ *
+ * @param[in,out]  renderer            Renderer context.
+ * @param[in]      bltfx               Pointer to DirectDraw BLT effects object.
+ */
+void TmRendererSetBltfx (TmRenderer* renderer, LPDDBLTFX bltfx);
+
+/**
+ * Get the device context for a DirectDraw surface.
+ *
+ * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  hdc                 Location where the device context will be placed.
+ * @param[in]      surface             Surface which owns the device context. If NULL,
+ *                                     the renderer's memory buffer will be used.
+ *
+ * @return         HRESULT             Status code from obtaining device context.
+ */
+HRESULT TmRendererGetSurfaceDeviceContext (TmRenderer* renderer,
+                                           HDC hdc,
+                                           LPDIRECTDRAWSURFACE2 surface);
+
+/**
+ * Release the device context for a DirectDraw surface.
+ *
+ * @param[in,out]  renderer            Renderer context.
+ * @param[in]      hdc                 Device context to release.
+ * @param[in,out]  surface             Surface which owns the device context. If NULL,
+ *                                     the renderer's memory buffer will be used.
+ *
+ * @return         HRESULT             Status code from releasing device context.
+ */
+HRESULT TmRendererReleaseSurfaceDeviceContext (TmRenderer* renderer,
+                                               HDC hdc,
+                                               LPDIRECTDRAWSURFACE2 surface);
+
 #endif /* TM_RENDERER_H */
