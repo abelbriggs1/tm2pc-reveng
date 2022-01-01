@@ -30,4 +30,25 @@ CHAR TmFsVerifyCdDrive (LPCSTR file_path);
  */
 DWORD TmFsInit (LPCSTR filename);
 
+/**
+ * Given a file name or relative path of a TM2 file, return an absolute path to
+ * the file.
+ *
+ * @param[out]     abs_path            Pointer to store the absolute path of the file.
+ * @param[in]      file_name           File name string. Can be a relative path from the
+ *                                     root of the TM2 directory.
+ * @param[in]      unk_val             TODO: What is this value?
+ */
+VOID TmFsGetFileAbsolutePath (LPSTR abs_path, LPCSTR file_name, int unk_val);
+
+/**
+ * Read the entirety of a file into an arbitrary buffer.
+ *
+ * @param[out]     buffer              Pointer to buffer to read the file into.
+ * @param[in]      file_path           Absolute path of the file to read.
+ *
+ * @return         DWORD               Number of bytes read into the buffer.
+ */
+DWORD TmFsReadFile (LPVOID buffer, LPCSTR file_path);
+
 #endif /* TM_FS_H */

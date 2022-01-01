@@ -477,10 +477,10 @@ HRESULT TmRendererRenderFrame (TmRenderer* renderer)
       case 3:
         IDirectDrawSurface2_Blt (renderer->backbuffer_surface, NULL, renderer->membuffer_surface,
                                  NULL, DDBLT_WAIT, NULL);
-        result = IDirectDrawSurface2_Flip (renderer->primary_surface, NULL, 1);
+        result = IDirectDrawSurface2_Flip (renderer->primary_surface, NULL, DDFLIP_WAIT);
         break;
       case 4:
-        result = IDirectDrawSurface2_Flip (renderer->primary_surface, NULL, 1);
+        result = IDirectDrawSurface2_Flip (renderer->primary_surface, NULL, DDFLIP_WAIT);
         break;
     }
   } else {
@@ -528,6 +528,42 @@ DWORD TmRendererGetDisplayWidth (TmRenderer* renderer)
 DWORD TmRendererGetDisplayHeight (TmRenderer* renderer)
 {
   return renderer->height;
+}
+
+/**
+ * Get the RGBA bit masks used for the renderer's draw surface.
+ *
+ * @address        0x004B5A20
+ *
+ * @param[in]      renderer            Renderer context.
+ * @param[out]     red_mask            Pointer to store red bit mask in. Optional.
+ * @param[out]     green_mask          Pointer to store green bit mask in. Optional.
+ * @param[out]     blue_mask           Pointer to store blue bit mask in. Optional.
+ * @param[out]     alpha_mask          Pointer to store alpha bit mask in. Optional.
+ */
+VOID TmRendererGetColorDepthMasks (TmRenderer* renderer,
+                                   DWORD* red_mask,
+                                   DWORD* green_mask,
+                                   DWORD* blue_mask,
+                                   DWORD* alpha_mask)
+{
+  DDSURFACEDESC desc;
+  memset (&desc, 0, sizeof (desc));
+  desc.dwSize = sizeof (desc);
+
+  IDirectDrawSurface2_GetSurfaceDesc (renderer->primary_surface, &desc);
+  if (red_mask) {
+    *red_mask = desc.ddpfPixelFormat.dwRBitMask;
+  }
+  if (green_mask) {
+    *green_mask = desc.ddpfPixelFormat.dwGBitMask;
+  }
+  if (blue_mask) {
+    *blue_mask = desc.ddpfPixelFormat.dwBBitMask;
+  }
+  if (alpha_mask) {
+    *alpha_mask = desc.ddpfPixelFormat.dwRGBAlphaBitMask;
+  }
 }
 
 /**

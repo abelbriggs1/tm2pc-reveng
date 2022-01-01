@@ -163,3 +163,64 @@ DWORD TmFsInit (LPCSTR filename)
   }
   return 1;
 }
+
+/**
+ * Given a file name or relative path of a TM2 file, return an absolute path to
+ * the file.
+ *
+ * @address        0x00499408
+ *
+ * @param[out]     abs_path            Pointer to store the absolute path of the file.
+ * @param[in]      file_name           File name string. Can be a relative path from the
+ *                                     root of the TM2 directory.
+ * @param[in]      unk_val             TODO: What is this value?
+ */
+VOID TmFsGetFileAbsolutePath (LPSTR abs_path, LPCSTR file_name, int unk_val)
+{
+  LPCSTR empty = "";
+  LPSTR base;
+
+  if (unk_val >= 0 && unk_val < 7) {
+    if (unk_val == 6) {
+      // NB: In the original binary, TmFsVerifyCdDrive() is inlined here.
+      CHAR drive = TmFsVerifyCdDrive (path_icon);
+      if (drive < 0) {
+        base = empty;
+      } else {
+        wsprintfA (&path_executable, "%c:", drive);
+        base = &path_executable;
+      }
+    } else {
+      base = &path_executable;
+    }
+  } else {
+    base = empty;
+  }
+
+  wsprintfA (abs_path, "%s\\%s", base, file_name);
+}
+
+/**
+ * Read the entirety of a file into an arbitrary buffer.
+ *
+ * @address        0x00498D18
+ *
+ * @param[out]     buffer              Pointer to buffer to read the file into.
+ * @param[in]      file_path           Absolute path of the file to read.
+ *
+ * @return         DWORD               Number of bytes read into the buffer.
+ */
+DWORD TmFsReadFile (LPVOID buffer, LPCSTR file_path)
+{
+  HANDLE file = CreateFileA (file_path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                             FILE_FLAG_RANDOM_ACCESS | FILE_ATTRIBUTE_NORMAL, NULL);
+  if (file == -1) {
+    return 0;
+  }
+
+  DWORD num_bytes_to_read = GetFileSize (file, NULL);
+  DWORD num_bytes_read;
+  ReadFile (file, buffer, num_bytes_to_read, &num_bytes_read, NULL);
+  CloseHandle (file);
+  return num_bytes_read;
+}

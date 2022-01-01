@@ -71,6 +71,21 @@ DWORD TmRendererGetDisplayWidth (TmRenderer* renderer);
 DWORD TmRendererGetDisplayHeight (TmRenderer* renderer);
 
 /**
+ * Get the RGBA bit masks used for the renderer's draw surface.
+ *
+ * @param[in]      renderer            Renderer context.
+ * @param[out]     red_mask            Pointer to store red bit mask in. Optional.
+ * @param[out]     green_mask          Pointer to store green bit mask in. Optional.
+ * @param[out]     blue_mask           Pointer to store blue bit mask in. Optional.
+ * @param[out]     alpha_mask          Pointer to store alpha bit mask in. Optional.
+ */
+VOID TmRendererGetColorDepthMasks (TmRenderer* renderer,
+                                   DWORD* red_mask,
+                                   DWORD* green_mask,
+                                   DWORD* blue_mask,
+                                   DWORD* alpha_mask);
+
+/**
  * Set the effects for the renderer to use on bit block transfers.
  *
  * @param[in,out]  renderer            Renderer context.
