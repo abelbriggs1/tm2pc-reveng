@@ -9,8 +9,11 @@ Experience reading x86 assembly and low-level C programming is highly recommende
 Experience reading and writing Win32 applications is helpful.
 
 To contribute, simply open TM2.EXE in your favorite reverse engineering tool and
-start adding information from this repository. Most function definitions and static/global
-variables/structures will have their addresses documented with `@address`.
+start adding information from this repository.
+
+Most function definitions and static/global variables/structures will have their addresses documented with `@address`. Functions with `@address N/A` are usually wrapper functions
+which are heavily likely to have existed in the codebase as public C interfaces for
+a C++ module, but were optimized out due to inlining.
 
 There are many `TODO:` comments scattered across the code indicating notable fields,
 functions, or modules which need investigation.
