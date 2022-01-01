@@ -1,14 +1,14 @@
 /**
  * @file texture.c
  *
- * Internal renderer texture functions.
+ * Internal graphics texture functions.
  */
 
 #include <windows.h>
 
-#include "renderer_internal.h"
+#include "graphics_internal.h"
 
-#include "win32/renderer.h"
+#include "win32/graphics.h"
 
 #include "texture.h"
 

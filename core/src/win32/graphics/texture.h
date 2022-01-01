@@ -1,7 +1,7 @@
 /**
  * @file texture.h
  *
- * Internal renderer texture functions and structures.
+ * Internal graphics texture functions and structures.
  */
 
 typedef struct {

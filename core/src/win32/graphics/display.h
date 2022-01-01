@@ -1,7 +1,7 @@
 /**
  * @file display.h
  *
- * Internal renderer display functions and structures.
+ * Internal graphics context display functions and structures.
  */
 
 typedef struct {
@@ -30,14 +30,14 @@ typedef struct {
 
 /**
  * Given a DirectDraw surface descriptor which describes a display mode,
- * determine if the display mode is valid and add it to the renderer's
+ * determine if the display mode is valid and add it to the graphics context's
  * list of enumerated display modes if so.
  *
  * This function is a callback for IDirectDraw2_EnumDisplayModes and
  * should not be called by normal means.
  *
  * @param[in]      desc                Surface descriptor which describes a display mode.
- * @param[in,out]  internal            Internal renderer display capabilities structure.
+ * @param[in,out]  internal            Internal graphics context display capabilities structure.
  *
  * @return         DDENUMRET_OK        This function always returns DDENUMRET_OK.
  */
@@ -61,12 +61,12 @@ int CompareDisplayModes (const void* arg1, const void* arg2);
 
 /**
  * Retrieve DirectDraw hardware capabilities and save them in an internal
- * renderer structure for later use.
+ * graphics context structure for later use.
  *
- * @param[in]      renderer            Renderer context.
+ * @param[in]      graphics            Graphics context.
  * @param[in,out]  caps                Internal capabilities structure.
  *
  * @return         DD_OK               Hardware capabilities were successfully retrieved.
  * @return         other               An error occurred retrieving hardware capabilities.
  */
-HRESULT GetHardwareCapabilities (TmRenderer* renderer, DisplayCapabilities* caps);
+HRESULT GetHardwareCapabilities (TmGraphics* graphics, DisplayCapabilities* caps);

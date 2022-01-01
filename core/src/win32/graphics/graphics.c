@@ -1,10 +1,10 @@
 /**
- * @file renderer.c
+ * @file graphics.c
  *
- * Renderer functions.
+ * Graphics functions.
  */
 
-#include "renderer_internal.h"
+#include "graphics_internal.h"
 
 #include "win32/error.h"
 #include "win32/registry.h"
@@ -63,12 +63,12 @@ typedef struct {
   DWORD unk13;
   DWORD unk14;
   DWORD unk15;
-} Renderer3dProperties;  // total size 0x6C bytes
+} Graphics3dProperties;  // total size 0x6C bytes
 
-DWORD unk_renderer_init_flag;  // @address 0x00C85008
+DWORD unk_graphics_init_flag;  // @address 0x00C85008
 
 static DWORD coop_level;                        // @address 0x004E86AC
-static Renderer3dProperties renderer_3d_props;  // @address 0x00C84F74
+static Graphics3dProperties graphics_3d_props;  // @address 0x00C84F74
 static DisplayCapabilities display_caps;        // @address 0x00C848E0
 static UnkTextureStruct textures[512];          // @address 0x00A2DC48
 
@@ -77,34 +77,34 @@ static UnkTextureStruct textures[512];          // @address 0x00A2DC48
  *
  * @address        0x004B5EE8
  *
- * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  graphics            Graphics context.
  */
-static VOID ReleaseHalDevice (TmRenderer* renderer)
+static VOID ReleaseHalDevice (TmGraphics* graphics)
 {
-  if (renderer->background) {
-    IDirect3DMaterial2_Release (renderer->background);
-    renderer->background = NULL;
+  if (graphics->background) {
+    IDirect3DMaterial2_Release (graphics->background);
+    graphics->background = NULL;
   }
-  if (renderer->unk_material) {
-    IDirect3DMaterial2_Release (renderer->unk_material);
-    renderer->unk_material = NULL;
+  if (graphics->unk_material) {
+    IDirect3DMaterial2_Release (graphics->unk_material);
+    graphics->unk_material = NULL;
   }
-  if (renderer->viewport) {
-    if (renderer->hal_device) {
-      IDirect3DDevice2_DeleteViewport (renderer->hal_device, renderer->viewport);
+  if (graphics->viewport) {
+    if (graphics->hal_device) {
+      IDirect3DDevice2_DeleteViewport (graphics->hal_device, graphics->viewport);
     }
-    IDirect3DViewport2_Release (renderer->viewport);
-    renderer->viewport = NULL;
+    IDirect3DViewport2_Release (graphics->viewport);
+    graphics->viewport = NULL;
   }
   ReleaseUnkTextureStructs ();
-  if (renderer->hal_device) {
-    IDirect3DDevice2_Release (renderer->hal_device);
-    renderer->hal_device = NULL;
+  if (graphics->hal_device) {
+    IDirect3DDevice2_Release (graphics->hal_device);
+    graphics->hal_device = NULL;
   }
 }
 
 /**
- * Release the renderer's texture structures.
+ * Release texture structures.
  *
  * @address        0x00497828
  */
@@ -118,17 +118,17 @@ static VOID ReleaseUnkTextureStructs ()
 }
 
 /**
- * Create the renderer's backbuffer.
+ * Create the graphics context's backbuffer.
  *
  * On error, this function raises structured exceptions which the caller
  * must handle.
  *
  * @address        0x004B48F4
  *
- * @param[in,out]  renderer           Renderer context.
+ * @param[in,out]  graphics           Graphics context.
  *
  */
-static VOID CreateBackbufferSurface (TmRenderer* renderer)
+static VOID CreateBackbufferSurface (TmGraphics* graphics)
 {
   HRESULT result;
   DWORD surface_caps;
@@ -138,29 +138,29 @@ static VOID CreateBackbufferSurface (TmRenderer* renderer)
   if (display_caps.hw_no_2d_during_3d_scene) {
     result = E_FAIL;
   } else {
-    surface_caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
+    surface_caps = unk_graphics_init_flag ? DDSCAPS_3DDEVICE : 0;
     surface_caps |= DDSCAPS_VIDEOMEMORY | DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
-    result = CreateSurface (renderer, renderer->primary_surface, 0, 0, surface_caps, 2);
+    result = CreateSurface (graphics, graphics->primary_surface, 0, 0, surface_caps, 2);
   }
 
   if (FAILED (result)) {
     // The host might not support triple buffering, so try with less backbuffers.
-    surface_caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
+    surface_caps = unk_graphics_init_flag ? DDSCAPS_3DDEVICE : 0;
     surface_caps |= DDSCAPS_VIDEOMEMORY | DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
-    result = CreateSurface (renderer, renderer->primary_surface, 0, 0, surface_caps, 1);
+    result = CreateSurface (graphics, graphics->primary_surface, 0, 0, surface_caps, 1);
   }
 
   if (FAILED (result)) {
     // The host might not have a GPU with video memory, so make a last-ditch
     // effort to run without VRAM.
-    surface_caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
+    surface_caps = unk_graphics_init_flag ? DDSCAPS_3DDEVICE : 0;
     surface_caps |= DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
-    result = CreateSurface (renderer, renderer->primary_surface, 0, 0, surface_caps, 2);
+    result = CreateSurface (graphics, graphics->primary_surface, 0, 0, surface_caps, 2);
   }
 
   if (FAILED (result)) {
     // Your PC is hopeless.
-    ReleaseSurfaces (renderer);
+    ReleaseSurfaces (graphics);
     TmErrorMessage (TM_ERROR_DRAW_CREATE_BACKBUFFER_FAIL, HRESULT_CODE (result));
     // TODO: Unwind is called here in the original binary - how do we
     // duplicate that?
@@ -170,43 +170,43 @@ static VOID CreateBackbufferSurface (TmRenderer* renderer)
   DDSCAPS caps;
   memset (&caps, 0, sizeof (caps));
   caps.dwCaps = DDSCAPS_BACKBUFFER;
-  result = IDirectDrawSurface2_GetAttachedSurface (renderer->primary_surface, &caps,
-                                                   renderer->backbuffer_surface);
+  result = IDirectDrawSurface2_GetAttachedSurface (graphics->primary_surface, &caps,
+                                                   graphics->backbuffer_surface);
   if (FAILED (result)) {
-    ReleaseSurfaces (renderer);
+    ReleaseSurfaces (graphics);
     TmErrorMessage (TM_ERROR_DRAW_NO_BACKBUFFER, HRESULT_CODE (result));
     // TODO: Unwind is called here in the original binary - how do we
     // duplicate that?
     RaiseException (0, 0, 0, NULL);
   }
 
-  renderer->membuffer_surface = renderer->backbuffer_surface;
-  renderer->unk_enum_val = 4;
-  IDirectDrawSurface2_GetCaps (renderer->backbuffer_surface, &caps);
+  graphics->membuffer_surface = graphics->backbuffer_surface;
+  graphics->unk_enum_val = 4;
+  IDirectDrawSurface2_GetCaps (graphics->backbuffer_surface, &caps);
   if ((caps.dwCaps & DDSCAPS_VIDEOMEMORY) && display_caps.hw_bank_switched &&
-      SUCCEEDED (CreateSurface (renderer, renderer->membuffer_surface, renderer->width,
-                                renderer->height, DDSCAPS_SYSTEMMEMORY, 0))) {
-    renderer->unk_enum_val = 3;
+      SUCCEEDED (CreateSurface (graphics, graphics->membuffer_surface, graphics->width,
+                                graphics->height, DDSCAPS_SYSTEMMEMORY, 0))) {
+    graphics->unk_enum_val = 3;
   }
 }
 
 /**
- * Create the renderer's primary draw surface and memory buffer.
+ * Create the graphics context's primary draw surface and memory buffer.
  *
  * On error, this function raises structured exceptions which the caller
  * must handle.
  *
  * @address        0x004B4B18
  *
- * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  graphics            Graphics context.
  */
-static VOID CreatePrimaryAndMembufferSurfaces (TmRenderer* renderer)
+static VOID CreatePrimaryAndMembufferSurfaces (TmGraphics* graphics)
 {
   HRESULT result;
 
-  DWORD caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
+  DWORD caps = unk_graphics_init_flag ? DDSCAPS_3DDEVICE : 0;
   caps |= DDSCAPS_PRIMARYSURFACE;
-  result = CreateSurface (renderer, renderer->primary_surface, 0, 0, caps, 0);
+  result = CreateSurface (graphics, graphics->primary_surface, 0, 0, caps, 0);
   if (FAILED (result)) {
     TmErrorMessage (TM_ERROR_DRAW_SURFACE_FAIL, HRESULT_CODE (result));
     // TODO: Unwind is called here in the original binary - how do we
@@ -214,9 +214,9 @@ static VOID CreatePrimaryAndMembufferSurfaces (TmRenderer* renderer)
     RaiseException (0, 0, 0, NULL);
   }
 
-  caps = unk_renderer_init_flag ? DDSCAPS_3DDEVICE : 0;
+  caps = unk_graphics_init_flag ? DDSCAPS_3DDEVICE : 0;
   caps |= DDSCAPS_SYSTEMMEMORY;
-  result = CreateSurface (renderer, renderer->membuffer_surface, renderer->width, renderer->height,
+  result = CreateSurface (graphics, graphics->membuffer_surface, graphics->width, graphics->height,
                           caps, 0);
   if (FAILED (result)) {
     TmErrorMessage (TM_ERROR_DRAW_CREATE_MEMBUFFER_FAIL, HRESULT_CODE (result));
@@ -225,75 +225,75 @@ static VOID CreatePrimaryAndMembufferSurfaces (TmRenderer* renderer)
     RaiseException (0, 0, 0, NULL);
   }
 
-  renderer->unk_enum_val = (renderer->unk_enum_val2 != 0);
+  graphics->unk_enum_val = (graphics->unk_enum_val2 != 0);
 }
 
 /**
- * Initialize the renderer's Direct3D functionality.
+ * Initialize the graphics context's Direct3D functionality.
  *
  * @address        0x004B5BF0
  *
- * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  graphics            Graphics context.
  *
  * @return         DD_OK               Direct3D was successfully initialized.
  * @return         others              An error occurred during Direct3D initialization.
  */
-static HRESULT InitDirect3d (TmRenderer* renderer)
+static HRESULT InitDirect3d (TmGraphics* graphics)
 {
-  memset (&renderer_3d_props, 0, sizeof (renderer_3d_props));
+  memset (&graphics_3d_props, 0, sizeof (graphics_3d_props));
 
   // TODO: what do these literal values mean?
-  renderer_3d_props.unk1 = 0;
-  renderer_3d_props.unk2 = 0;
-  renderer_3d_props.unk_render_state1 = 0;
-  renderer_3d_props.specular_enable = 0;
-  renderer_3d_props.zbuf_enable = 0;
-  renderer_3d_props.zbuf_write_enable = 0;
-  renderer_3d_props.zbuf_func = 4;
-  renderer_3d_props.dest_blend = 4;
-  renderer_3d_props.alpha_blend_enable = 0;
-  renderer_3d_props.unk13 = 0;
-  renderer_3d_props.shade_mode = 1;
-  renderer_3d_props.fill_mode = 3;
-  renderer_3d_props.dither_mode = 1;
-  renderer_3d_props.unk_render_state2 = 1;
-  renderer_3d_props.unk_render_state3 = 2;
-  renderer_3d_props.unk3 = 1;
+  graphics_3d_props.unk1 = 0;
+  graphics_3d_props.unk2 = 0;
+  graphics_3d_props.unk_render_state1 = 0;
+  graphics_3d_props.specular_enable = 0;
+  graphics_3d_props.zbuf_enable = 0;
+  graphics_3d_props.zbuf_write_enable = 0;
+  graphics_3d_props.zbuf_func = 4;
+  graphics_3d_props.dest_blend = 4;
+  graphics_3d_props.alpha_blend_enable = 0;
+  graphics_3d_props.unk13 = 0;
+  graphics_3d_props.shade_mode = 1;
+  graphics_3d_props.fill_mode = 3;
+  graphics_3d_props.dither_mode = 1;
+  graphics_3d_props.unk_render_state2 = 1;
+  graphics_3d_props.unk_render_state3 = 2;
+  graphics_3d_props.unk3 = 1;
 
-  renderer->d3d2 = NULL;
-  renderer->hal_device = NULL;
-  renderer->viewport = NULL;
-  renderer->unk3 = NULL;
+  graphics->d3d2 = NULL;
+  graphics->hal_device = NULL;
+  graphics->viewport = NULL;
+  graphics->unk3 = NULL;
 
   // TODO: Does this function's return value get used? The disassembly is
   // ambiguous.
-  return IDirectDraw2_QueryInterface (renderer->ddraw2, &IID_IDirect3D2, renderer->d3d2);
+  return IDirectDraw2_QueryInterface (graphics->ddraw2, &IID_IDirect3D2, graphics->d3d2);
 }
 
 /**
- * Initialize the renderer module.
+ * Initialize the graphics module.
  *
  * @address        0x004B3EAF
  *
- * @param[in,out]  renderer                  Renderer context.
- * @param[in]      unknown_renderer_flag     TODO: What is this flag?
+ * @param[in,out]  graphics                  Graphics context.
+ * @param[in]      unknown_graphics_flag     TODO: What is this flag?
  *
- * @return         DD_OK                     The renderer was initialized successfully.
+ * @return         DD_OK                     The graphics was initialized successfully.
  * @return         others                    An error occurred during initialization.
  */
-HRESULT TmRendererInit (TmRenderer* renderer, DWORD unknown_renderer_flag)
+HRESULT TmGraphicsInit (TmGraphics* graphics, DWORD unknown_graphics_flag)
 {
-  if (!renderer->ddraw2) {
-    renderer->hwnd = TmWindowGetHwnd (&global_window);
-    GetClientRect (renderer->hwnd, &renderer->rect);
-    ClientToScreen (renderer->hwnd, &renderer->rect);
-    ClientToScreen (renderer->hwnd, &renderer->rect.right);
-    HDC temp = GetDC (renderer->hwnd);
+  if (!graphics->ddraw2) {
+    graphics->hwnd = TmWindowGetHwnd (&global_window);
+    GetClientRect (graphics->hwnd, &graphics->rect);
+    ClientToScreen (graphics->hwnd, &graphics->rect);
+    ClientToScreen (graphics->hwnd, &graphics->rect.right);
+    HDC temp = GetDC (graphics->hwnd);
     // These two calls to GetScreenMetrics() appear to be no-ops.
     GetScreenMetrics (SM_CXSCREEN);
     GetScreenMetrics (SM_CYSCREEN);
-    renderer->maybe_bits_per_pixel2 = GetDeviceCaps (temp, BITSPIXEL);
-    ReleaseDC (renderer->hwnd, temp);
+    graphics->maybe_bits_per_pixel2 = GetDeviceCaps (temp, BITSPIXEL);
+    ReleaseDC (graphics->hwnd, temp);
   }
 
   // This also appears to be a no-op.
@@ -301,84 +301,84 @@ HRESULT TmRendererInit (TmRenderer* renderer, DWORD unknown_renderer_flag)
 
   GUID ddraw_guid;
   memset (&ddraw_guid, 0, sizeof (ddraw_guid));
-  memset (&renderer->d3d_hal_device_guid, 0, sizeof (renderer->d3d_hal_device_guid));
-  renderer->renderer_id = 0;
+  memset (&graphics->d3d_hal_device_guid, 0, sizeof (graphics->d3d_hal_device_guid));
+  graphics->graphics_id = 0;
 
   PHKEY key;
   if (REG_SUCCEEDED (TmRegistryOpenKey (key, HKEY_LOCAL_MACHINE, NULL))) {
     TmRegistryQueryKeyRaw (key, "DirectDraw GUID", &ddraw_guid, sizeof (ddraw_guid));
-    TmRegistryQueryKeyDword (key, "Renderer", &renderer->renderer_id);
+    TmRegistryQueryKeyDword (key, "Graphics", &graphics->graphics_id);
     TmRegistryCloseKey (key);
   }
 
   // If any of these are true, reinitialize all structures to a known-good state.
-  if (unknown_renderer_flag || renderer->renderer_id || !renderer->ddraw2) {
-    if (renderer->ddraw2) {
-      ReleaseHalDevice (renderer);
-      if (renderer->unk3) {
+  if (unknown_graphics_flag || graphics->graphics_id || !graphics->ddraw2) {
+    if (graphics->ddraw2) {
+      ReleaseHalDevice (graphics);
+      if (graphics->unk3) {
         // TODO: what is the D3D type here?
-        IDirect3D2_Release (renderer->unk3);
-        renderer->unk3 = NULL;
+        IDirect3D2_Release (graphics->unk3);
+        graphics->unk3 = NULL;
       }
-      if (renderer->d3d2) {
-        IDirect3D2_Release (renderer->d3d2);
-        renderer->d3d2 = NULL;
+      if (graphics->d3d2) {
+        IDirect3D2_Release (graphics->d3d2);
+        graphics->d3d2 = NULL;
       }
     }
 
-    if (renderer->ddraw2 && coop_level != COOP_NORMAL) {
+    if (graphics->ddraw2 && coop_level != COOP_NORMAL) {
       coop_level = COOP_NORMAL;
-      IDirectDraw2_SetCooperativeLevel (renderer->ddraw2, renderer->hwnd, COOP_NORMAL);
+      IDirectDraw2_SetCooperativeLevel (graphics->ddraw2, graphics->hwnd, COOP_NORMAL);
     }
 
-    ReleaseSurfaces (renderer);
+    ReleaseSurfaces (graphics);
 
-    if (renderer->ddraw2) {
-      IDirectDraw2_RestoreDisplayMode (renderer->ddraw2);
-      IDirectDraw2_Release (renderer->ddraw2);
-      renderer->ddraw2 = NULL;
+    if (graphics->ddraw2) {
+      IDirectDraw2_RestoreDisplayMode (graphics->ddraw2);
+      IDirectDraw2_Release (graphics->ddraw2);
+      graphics->ddraw2 = NULL;
     }
 
-    if (renderer->display_driver) {
-      IDirectDraw_Release (renderer->display_driver);
-      renderer->display_driver = NULL;
+    if (graphics->display_driver) {
+      IDirectDraw_Release (graphics->display_driver);
+      graphics->display_driver = NULL;
     }
 
     // TODO: This memcpy is inlined into the binary, but it seems to be
     // interleaved with user code, which confuses IDA's decompiler.
     // More analysis might be needed.
-    memcpy (&renderer->d3d_hal_device_guid, &IID_IDirect3DHALDevice,
-            sizeof (renderer->d3d_hal_device_guid));
+    memcpy (&graphics->d3d_hal_device_guid, &IID_IDirect3DHALDevice,
+            sizeof (graphics->d3d_hal_device_guid));
 
-    if (unknown_renderer_flag && renderer->renderer_id) {
-      unk_renderer_init_flag = unknown_renderer_flag;
-      renderer->unk_enum_val2 = unknown_renderer_flag;
+    if (unknown_graphics_flag && graphics->graphics_id) {
+      unk_graphics_init_flag = unknown_graphics_flag;
+      graphics->unk_enum_val2 = unknown_graphics_flag;
     } else {
-      unk_renderer_init_flag = 0;
+      unk_graphics_init_flag = 0;
     }
 
     // Test to see if the host supports our DirectDraw requirements and create our
     // DirectDraw2 object.
-    if (!renderer->ddraw2) {
-      HRESULT result = DirectDrawCreate (NULL, renderer->display_driver, NULL);
+    if (!graphics->ddraw2) {
+      HRESULT result = DirectDrawCreate (NULL, graphics->display_driver, NULL);
       // TODO: The code for initializing the display_driver jumps all over the place
       // and IDA's decompiler struggles with it - this section may need another analysis.
       if (SUCCEEDED (result)) {
-        if (renderer->ddraw2) {
+        if (graphics->ddraw2) {
           if (coop_level == COOP_NORMAL) {
             result = DD_OK;
           } else {
             coop_level = COOP_NORMAL;
-            result = IDirectDraw2_SetCooperativeLevel (renderer->ddraw2, renderer->hwnd,
+            result = IDirectDraw2_SetCooperativeLevel (graphics->ddraw2, graphics->hwnd,
                                                        COOP_NORMAL);
           }
         }
         if (SUCCEEDED (result)) {
-          result = IDirectDraw_QueryInterface (renderer->display_driver, &IID_IDirectDraw2,
-                                               renderer->ddraw2);
-          if (renderer->ddraw2) {
-            result = IDirectDraw_Release (renderer->display_driver);
-            renderer->display_driver = NULL;
+          result = IDirectDraw_QueryInterface (graphics->display_driver, &IID_IDirectDraw2,
+                                               graphics->ddraw2);
+          if (graphics->ddraw2) {
+            result = IDirectDraw_Release (graphics->display_driver);
+            graphics->display_driver = NULL;
           }
         }
       }
@@ -386,22 +386,22 @@ HRESULT TmRendererInit (TmRenderer* renderer, DWORD unknown_renderer_flag)
       if (FAILED (result)) {
         // TODO: There might be another flag controlling the inside of this
         // if block.
-        result = DirectDrawCreate (NULL, renderer->display_driver, NULL);
-        if (renderer->ddraw2) {
+        result = DirectDrawCreate (NULL, graphics->display_driver, NULL);
+        if (graphics->ddraw2) {
           if (coop_level == COOP_NORMAL) {
             result = DD_OK;
           } else {
             coop_level = COOP_NORMAL;
-            result = IDirectDraw2_SetCooperativeLevel (renderer->ddraw2, renderer->hwnd,
+            result = IDirectDraw2_SetCooperativeLevel (graphics->ddraw2, graphics->hwnd,
                                                        COOP_NORMAL);
           }
         }
         if (SUCCEEDED (result)) {
-          result = IDirectDraw_QueryInterface (renderer->display_driver, &IID_IDirectDraw2,
-                                               renderer->ddraw2);
-          if (renderer->ddraw2) {
-            result = IDirectDraw_Release (renderer->display_driver);
-            renderer->display_driver = NULL;
+          result = IDirectDraw_QueryInterface (graphics->display_driver, &IID_IDirectDraw2,
+                                               graphics->ddraw2);
+          if (graphics->ddraw2) {
+            result = IDirectDraw_Release (graphics->display_driver);
+            graphics->display_driver = NULL;
           }
         }
       }
@@ -419,22 +419,22 @@ HRESULT TmRendererInit (TmRenderer* renderer, DWORD unknown_renderer_flag)
     }
 
     // Enumerate all fullscreen display modes
-    if (renderer->ddraw2 && coop_level != COOP_FULL) {
+    if (graphics->ddraw2 && coop_level != COOP_FULL) {
       coop_level = COOP_FULL;
-      IDirectDraw2_SetCooperativeLevel (renderer->ddraw2, renderer->hwnd, COOP_FULL);
+      IDirectDraw2_SetCooperativeLevel (graphics->ddraw2, graphics->hwnd, COOP_FULL);
     }
     display_caps.count = 0;
-    IDirectDraw2_EnumDisplayModes (renderer->ddraw2, DDEDM_REFRESHRATES, NULL, &display_caps,
+    IDirectDraw2_EnumDisplayModes (graphics->ddraw2, DDEDM_REFRESHRATES, NULL, &display_caps,
                                    &EnumDisplayModesCallback);
-    if (renderer->ddraw2 && coop_level != COOP_NORMAL) {
+    if (graphics->ddraw2 && coop_level != COOP_NORMAL) {
       coop_level = COOP_NORMAL;
-      IDirectDraw2_SetCooperativeLevel (renderer->ddraw2, renderer->hwnd, COOP_NORMAL);
+      IDirectDraw2_SetCooperativeLevel (graphics->ddraw2, graphics->hwnd, COOP_NORMAL);
     }
     qsort (display_caps.modes, display_caps.count, CompareDisplayModes);
 
-    GetHardwareCapabilities (renderer, &display_caps);
-    if (unk_renderer_init_flag) {
-      InitDirect3d (renderer);
+    GetHardwareCapabilities (graphics, &display_caps);
+    if (unk_graphics_init_flag) {
+      InitDirect3d (graphics);
     }
   }
   return DD_OK;
@@ -445,57 +445,57 @@ HRESULT TmRendererInit (TmRenderer* renderer, DWORD unknown_renderer_flag)
  *
  * @address        0x004B5128
  *
- * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  graphics            Graphics context.
  *
  * @return         HRESULT             Error code from DirectDraw functions used to
  *                                     perform bit block transfers.
  */
-HRESULT TmRendererRenderFrame (TmRenderer* renderer)
+HRESULT TmGraphicsRenderFrame (TmGraphics* graphics)
 {
   // NB: The return value of this function is undefined if none of the
   // switch cases are hit.
   HRESULT result;
 
-  if (!renderer->primary_surface) {
+  if (!graphics->primary_surface) {
     return DD_OK;
   }
 
-  if (IDirectDrawSurface2_IsLost (renderer->primary_surface) == DDERR_SURFACELOST) {
-    RestoreSurfaces (renderer);
+  if (IDirectDrawSurface2_IsLost (graphics->primary_surface) == DDERR_SURFACELOST) {
+    RestoreSurfaces (graphics);
   }
 
-  if (renderer->bltfx) {
-    switch (renderer->unk_enum_val) {
+  if (graphics->bltfx) {
+    switch (graphics->unk_enum_val) {
       case 0:
-        result = IDirectDrawSurface2_Blt (renderer->primary_surface, &renderer->rect,
-                                          renderer->membuffer_surface, NULL, DDBLT_WAIT, NULL);
+        result = IDirectDrawSurface2_Blt (graphics->primary_surface, &graphics->rect,
+                                          graphics->membuffer_surface, NULL, DDBLT_WAIT, NULL);
         break;
       case 1:
-        result = IDirectDrawSurface2_Blt (renderer->primary_surface, NULL,
-                                          renderer->membuffer_surface, NULL, DDBLT_WAIT, NULL);
+        result = IDirectDrawSurface2_Blt (graphics->primary_surface, NULL,
+                                          graphics->membuffer_surface, NULL, DDBLT_WAIT, NULL);
         break;
       case 3:
-        IDirectDrawSurface2_Blt (renderer->backbuffer_surface, NULL, renderer->membuffer_surface,
+        IDirectDrawSurface2_Blt (graphics->backbuffer_surface, NULL, graphics->membuffer_surface,
                                  NULL, DDBLT_WAIT, NULL);
-        result = IDirectDrawSurface2_Flip (renderer->primary_surface, NULL, DDFLIP_WAIT);
+        result = IDirectDrawSurface2_Flip (graphics->primary_surface, NULL, DDFLIP_WAIT);
         break;
       case 4:
-        result = IDirectDrawSurface2_Flip (renderer->primary_surface, NULL, DDFLIP_WAIT);
+        result = IDirectDrawSurface2_Flip (graphics->primary_surface, NULL, DDFLIP_WAIT);
         break;
     }
   } else {
-    switch (renderer->unk_enum_val) {
+    switch (graphics->unk_enum_val) {
       case 0:
-        result = IDirectDrawSurface2_Blt (renderer->primary_surface, &renderer->rect,
-                                          renderer->membuffer_surface, NULL, DDBLT_WAIT,
-                                          renderer->bltfx);
+        result = IDirectDrawSurface2_Blt (graphics->primary_surface, &graphics->rect,
+                                          graphics->membuffer_surface, NULL, DDBLT_WAIT,
+                                          graphics->bltfx);
         break;
       case 1:
       case 3:
       case 4:
-        result = IDirectDrawSurface2_Blt (renderer->primary_surface, NULL,
-                                          renderer->membuffer_surface, NULL, DDBLT_WAIT,
-                                          renderer->bltfx);
+        result = IDirectDrawSurface2_Blt (graphics->primary_surface, NULL,
+                                          graphics->membuffer_surface, NULL, DDBLT_WAIT,
+                                          graphics->bltfx);
         break;
     }
   }
@@ -507,13 +507,13 @@ HRESULT TmRendererRenderFrame (TmRenderer* renderer)
  *
  * @address        0x004B5A14
  *
- * @param[in]      renderer            Renderer context.
+ * @param[in]      graphics            Graphics context.
  *
  * @return         DWORD               Display width, in pixels.
  */
-DWORD TmRendererGetDisplayWidth (TmRenderer* renderer)
+DWORD TmGraphicsGetDisplayWidth (TmGraphics* graphics)
 {
-  return renderer->width;
+  return graphics->width;
 }
 
 /**
@@ -521,27 +521,27 @@ DWORD TmRendererGetDisplayWidth (TmRenderer* renderer)
  *
  * @address        0x004B5A10
  *
- * @param[in]      renderer            Renderer context.
+ * @param[in]      graphics            Graphics context.
  *
  * @return         DWORD               Display height, in pixels.
  */
-DWORD TmRendererGetDisplayHeight (TmRenderer* renderer)
+DWORD TmGraphicsGetDisplayHeight (TmGraphics* graphics)
 {
-  return renderer->height;
+  return graphics->height;
 }
 
 /**
- * Get the RGBA bit masks used for the renderer's draw surface.
+ * Get the RGBA bit masks used for the graphics context's draw surface.
  *
  * @address        0x004B5A20
  *
- * @param[in]      renderer            Renderer context.
+ * @param[in]      graphics            Graphics context.
  * @param[out]     red_mask            Pointer to store red bit mask in. Optional.
  * @param[out]     green_mask          Pointer to store green bit mask in. Optional.
  * @param[out]     blue_mask           Pointer to store blue bit mask in. Optional.
  * @param[out]     alpha_mask          Pointer to store alpha bit mask in. Optional.
  */
-VOID TmRendererGetColorDepthMasks (TmRenderer* renderer,
+VOID TmGraphicsGetColorDepthMasks (TmGraphics* graphics,
                                    DWORD* red_mask,
                                    DWORD* green_mask,
                                    DWORD* blue_mask,
@@ -551,7 +551,7 @@ VOID TmRendererGetColorDepthMasks (TmRenderer* renderer,
   memset (&desc, 0, sizeof (desc));
   desc.dwSize = sizeof (desc);
 
-  IDirectDrawSurface2_GetSurfaceDesc (renderer->primary_surface, &desc);
+  IDirectDrawSurface2_GetSurfaceDesc (graphics->primary_surface, &desc);
   if (red_mask) {
     *red_mask = desc.ddpfPixelFormat.dwRBitMask;
   }
@@ -567,16 +567,16 @@ VOID TmRendererGetColorDepthMasks (TmRenderer* renderer,
 }
 
 /**
- * Set the effects for the renderer to use on bit block transfers.
+ * Set the effects for the graphics context to use on bit block transfers.
  *
  * @address        0x004B50F8
  *
- * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  graphics            Graphics context.
  * @param[in]      bltfx               Pointer to DirectDraw BLT effects object.
  */
-VOID TmRendererSetBltfx (TmRenderer* renderer, LPDDBLTFX bltfx)
+VOID TmGraphicsSetBltfx (TmGraphics* graphics, LPDDBLTFX bltfx)
 {
-  renderer->bltfx = bltfx;
+  graphics->bltfx = bltfx;
 }
 
 /**
@@ -584,19 +584,19 @@ VOID TmRendererSetBltfx (TmRenderer* renderer, LPDDBLTFX bltfx)
  *
  * @address        0x004B50A4
  *
- * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  graphics            Graphics context.
  * @param[in,out]  hdc                 Location where the device context will be placed.
  * @param[in]      surface             Surface which owns the device context. If NULL,
- *                                     the renderer's memory buffer will be used.
+ *                                     the graphics's memory buffer will be used.
  *
  * @return         HRESULT             Status code from obtaining device context.
  */
-HRESULT TmRendererGetSurfaceDeviceContext (TmRenderer* renderer,
+HRESULT TmGraphicsGetSurfaceDeviceContext (TmGraphics* graphics,
                                            HDC hdc,
                                            LPDIRECTDRAWSURFACE2 surface)
 {
   if (!surface) {
-    surface = renderer->membuffer_surface;
+    surface = graphics->membuffer_surface;
   }
   return IDirectDrawSurface2_GetDC (surface, hdc);
 }
@@ -606,19 +606,19 @@ HRESULT TmRendererGetSurfaceDeviceContext (TmRenderer* renderer,
  *
  * @address        0x004B50B8
  *
- * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  graphics            Graphics context.
  * @param[in]      hdc                 Device context to release.
  * @param[in,out]  surface             Surface which owns the device context. If NULL,
- *                                     the renderer's memory buffer will be used.
+ *                                     the graphics's memory buffer will be used.
  *
  * @return         HRESULT             Status code from releasing device context.
  */
-HRESULT TmRendererReleaseSurfaceDeviceContext (TmRenderer* renderer,
+HRESULT TmGraphicsReleaseSurfaceDeviceContext (TmGraphics* graphics,
                                                HDC hdc,
                                                LPDIRECTDRAWSURFACE2 surface)
 {
   if (!surface) {
-    surface = renderer->membuffer_surface;
+    surface = graphics->membuffer_surface;
   }
   return IDirectDrawSurface2_ReleaseDC (surface, hdc);
 }
@@ -631,25 +631,25 @@ HRESULT TmRendererReleaseSurfaceDeviceContext (TmRenderer* renderer,
  *
  * @address        0x004B4C80
  *
- * @param[in,out]  renderer            Renderer context.
+ * @param[in,out]  graphics            Graphics context.
  */
-VOID TmRendererDisplay (TmRenderer* renderer)
+VOID TmGraphicsDisplay (TmGraphics* graphics)
 {
   HRESULT result;
-  renderer->unk_enum_val2 = 1;
+  graphics->unk_enum_val2 = 1;
 
-  ReleaseSurfaces (renderer);
+  ReleaseSurfaces (graphics);
 
-  LONG window_desc = GetWindowLongA (renderer->hwnd, GWL_STYLE);
-  SetWindowLongA (renderer->hwnd, GWL_STYLE,
+  LONG window_desc = GetWindowLongA (graphics->hwnd, GWL_STYLE);
+  SetWindowLongA (graphics->hwnd, GWL_STYLE,
                   window_desc & ~(WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX));
 
-  if (renderer->ddraw2) {
+  if (graphics->ddraw2) {
     if (coop_level == COOP_CHANGING) {
       result = DD_OK;
     } else {
       coop_level = COOP_CHANGING;
-      result = IDirectDraw2_SetCooperativeLevel (renderer->ddraw2, renderer->hwnd, COOP_CHANGING);
+      result = IDirectDraw2_SetCooperativeLevel (graphics->ddraw2, graphics->hwnd, COOP_CHANGING);
     }
   } else {
     result = DD_OK;
@@ -662,27 +662,27 @@ VOID TmRendererDisplay (TmRenderer* renderer)
     RaiseException (0, 0, 0, NULL);
   }
 
-  if (renderer->ddraw2) {
-    IDirectDraw2_RestoreDisplayMode (renderer->ddraw2);
+  if (graphics->ddraw2) {
+    IDirectDraw2_RestoreDisplayMode (graphics->ddraw2);
   }
-  if (FAILED (IDirectDraw2_SetDisplayMode (renderer->ddraw2, renderer->width, renderer->height,
-                                           renderer->maybe_bits_per_pixel, renderer->monitor_freq,
+  if (FAILED (IDirectDraw2_SetDisplayMode (graphics->ddraw2, graphics->width, graphics->height,
+                                           graphics->maybe_bits_per_pixel, graphics->monitor_freq,
                                            NULL))) {
-    TmErrorMessage (TM_ERROR_DRAW_UNSUPPORTED_VIDEO_MODE, renderer->width, renderer->height,
-                    renderer->maybe_bits_per_pixel);
+    TmErrorMessage (TM_ERROR_DRAW_UNSUPPORTED_VIDEO_MODE, graphics->width, graphics->height,
+                    graphics->maybe_bits_per_pixel);
     // TODO: Unwind is called here in the original binary - how do we
     // duplicate that?
     RaiseException (0, 0, 0, NULL);
   }
 
-  if (unk_renderer_init_flag) {
-    CreateBackbufferSurface (renderer);
+  if (unk_graphics_init_flag) {
+    CreateBackbufferSurface (graphics);
   } else {
-    if (renderer->bltfx) {
-      CreateBackbufferSurface (renderer);
+    if (graphics->bltfx) {
+      CreateBackbufferSurface (graphics);
     } else {
-      CreatePrimaryAndMembufferSurfaces (renderer);
+      CreatePrimaryAndMembufferSurfaces (graphics);
     }
   }
-  CreateClipper (renderer);
+  CreateClipper (graphics);
 }

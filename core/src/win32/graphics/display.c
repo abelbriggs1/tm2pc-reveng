@@ -1,14 +1,14 @@
 /**
  * @file display.c
  *
- * Internal renderer display functions.
+ * Internal graphics context display functions.
  */
 
-#include "renderer_internal.h"
+#include "graphics_internal.h"
 
 /**
  * Given a DirectDraw surface descriptor which describes a display mode,
- * determine if the display mode is valid and add it to the renderer's
+ * determine if the display mode is valid and add it to the graphics context's
  * list of enumerated display modes if so.
  *
  * This function is a callback for IDirectDraw2_EnumDisplayModes and
@@ -17,7 +17,7 @@
  * @address        0x004B592C
  *
  * @param[in]      desc                Surface descriptor which describes a display mode.
- * @param[in,out]  internal            Internal renderer display capabilities structure.
+ * @param[in,out]  internal            Internal graphics context display capabilities structure.
  *
  * @return         DDENUMRET_OK        This function always returns DDENUMRET_OK.
  */
@@ -26,7 +26,7 @@ HRESULT EnumDisplayModesCallback (LPDDSURFACEDESC2 desc, LPVOID internal)
   DisplayCapabilities* caps = (DisplayCapabilities*)internal;
 
   if (desc->ddpfPixelFormat.dwRGBBitCount == 16) {
-    DWORD max_width = unk_renderer_init_flag ? 800 : 640;
+    DWORD max_width = unk_graphics_init_flag ? 800 : 640;
     if (max_width >= desc->dwWidth) {
       caps->modes[caps->count].width = desc->dwWidth;
       caps->modes[caps->count].height = desc->dwHeight;
@@ -71,24 +71,24 @@ int CompareDisplayModes (const void* arg1, const void* arg2)
 
 /**
  * Retrieve DirectDraw hardware capabilities and save them in an internal
- * renderer structure for later use.
+ * graphics context structure for later use.
  *
  * @address        0x004B5874
  *
- * @param[in]      renderer            Renderer context.
+ * @param[in]      graphics            Graphics context.
  * @param[in,out]  caps                Internal capabilities structure.
  *
  * @return         DD_OK               Hardware capabilities were successfully retrieved.
  * @return         other               An error occurred retrieving hardware capabilities.
  */
-HRESULT GetHardwareCapabilities (TmRenderer* renderer, DisplayCapabilities* caps)
+HRESULT GetHardwareCapabilities (TmGraphics* graphics, DisplayCapabilities* caps)
 {
   memset (&caps->hw_caps, 0, sizeof (caps->hw_caps));
   caps->hw_caps.dwSize = sizeof (caps->hw_caps);
   memset (&caps->hel_caps, 0, sizeof (caps->hel_caps));
   caps->hel_caps.dwSize = sizeof (caps->hw_caps);
 
-  HRESULT result = IDirectDraw2_GetCaps (renderer->ddraw2, &caps->hw_caps, &caps->hel_caps);
+  HRESULT result = IDirectDraw2_GetCaps (graphics->ddraw2, &caps->hw_caps, &caps->hel_caps);
   if (SUCCEEDED (result)) {
     caps->hw_supports_3d = (caps->hw_caps.dwCaps & DDCAPS_3D) != 0;
     caps->hw_bank_switched = (caps->hw_caps.dwCaps & DDCAPS_BANKSWITCHED) != 0;
