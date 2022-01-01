@@ -12,6 +12,9 @@ To contribute, simply open TM2.EXE in your favorite reverse engineering tool and
 start adding information from this repository. Most function definitions and static/global
 variables/structures will have their addresses documented with `@address`.
 
+There are many `TODO:` comments scattered across the code indicating notable fields,
+functions, or modules which need investigation.
+
 Once you've made progress in an undocumented module/function/structure, feel free to submit
 a pull request.
 

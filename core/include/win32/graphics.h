@@ -7,6 +7,25 @@
 #ifndef TM_GRAPHICS_H
 #define TM_GRAPHICS_H
 
+// TODO TODO TODO: Based on my limited understanding of C++ compilers,
+// it is very likely that this module is a C++ class and that
+// ReleaseHalDevice() / RestoreSurfaces() are C++ `friend` functions.
+//
+// However, I'm not sure how to duplicate the original binary
+// if this is the case.
+//
+// Since there are no virtual functions, WATCOM should still generate
+// a C-like object (all structure members together in memory, function
+// calls resolved statically).
+//
+// However, TmGraphicsInit() is absolutely not a constructor -
+// it returns an HRESULT that is actually used by callers, and it is
+// called multiple times on the global TmGraphics instance. As new as C++98
+// was in 1997, I have a tough time believing SingleTrac would leave
+// the constructor/destructor unimplemented and use Init/Deinit functions
+// instead unless they had a great reason that I cannot see yet.
+//
+// More research is needed.
 typedef struct {
   DWORD display_mode_index;  // unknown type
   LPDIRECTDRAW display_driver;
