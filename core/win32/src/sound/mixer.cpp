@@ -16,25 +16,23 @@
  * Set game volume to default values.
  *
  * @address        0x00486B44
- *
- * @param[in,out]  sound               Sound context.
  */
-static VOID MixerUseDefaultVolume (SoundContext* sound)
+VOID SoundContext::MixerUseDefaultVolume ()
 {
-  sound->game_vol[0].waveout_vol = DEFAULT_VOLUME_WAVE_UNSIGNED;
-  sound->game_vol[0].cd_vol = DEFAULT_VOLUME_CD_UNSIGNED;
-  sound->game_vol[0].bass_vol = 0;
-  sound->game_vol[0].treble_vol = 0;
+  this->game_vol[0].waveout_vol = DEFAULT_VOLUME_WAVE_UNSIGNED;
+  this->game_vol[0].cd_vol = DEFAULT_VOLUME_CD_UNSIGNED;
+  this->game_vol[0].bass_vol = 0;
+  this->game_vol[0].treble_vol = 0;
 
-  sound->game_vol[1].waveout_vol = DEFAULT_VOLUME_WAVE_UNSIGNED;
-  sound->game_vol[1].cd_vol = DEFAULT_VOLUME_CD_UNSIGNED;
-  sound->game_vol[1].bass_vol = 0;
-  sound->game_vol[1].treble_vol = 0;
+  this->game_vol[1].waveout_vol = DEFAULT_VOLUME_WAVE_UNSIGNED;
+  this->game_vol[1].cd_vol = DEFAULT_VOLUME_CD_UNSIGNED;
+  this->game_vol[1].bass_vol = 0;
+  this->game_vol[1].treble_vol = 0;
 
-  sound->game_vol[2].waveout_vol = DEFAULT_VOLUME_WAVE_UNSIGNED;
-  sound->game_vol[2].cd_vol = DEFAULT_VOLUME_CD_UNSIGNED;
-  sound->game_vol[2].bass_vol = 0;
-  sound->game_vol[2].treble_vol = 0;
+  this->game_vol[2].waveout_vol = DEFAULT_VOLUME_WAVE_UNSIGNED;
+  this->game_vol[2].cd_vol = DEFAULT_VOLUME_CD_UNSIGNED;
+  this->game_vol[2].bass_vol = 0;
+  this->game_vol[2].treble_vol = 0;
 }
 
 /**
@@ -42,11 +40,10 @@ static VOID MixerUseDefaultVolume (SoundContext* sound)
  *
  * @address        0x00489340
  *
- * @param[in,out]  sound               Sound context.
  * @param[in]      component_type      Win32 MIXERLINE volume type value.
  * @param[in]      volume              Volume as an unsigned 16-bit integer.
  */
-static VOID MixerUpdateComponentVolume (SoundContext* sound, DWORD component_type, DWORD volume)
+MMRESULT SoundContext::MixerUpdateComponentVolume (DWORD component_type, DWORD volume)
 {
   MIXERLINEA mixer;
   MIXERCONTROLDETAILS details;
@@ -55,26 +52,26 @@ static VOID MixerUpdateComponentVolume (SoundContext* sound, DWORD component_typ
   mixer.dwComponentType = component_type;
   mixer.cbStruct = sizeof (MIXERLINEA);
 
-  if (MM_FAILED (mixerGetLineInfoA (sound->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE))) {
+  if (MM_FAILED (mixerGetLineInfoA (this->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE))) {
     if (component_type == MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC) {
       int dev = auxGetNumDevs ();
       if (dev > 0) {
         do {
           dev--;
           mixer.cbStruct = sizeof (MIXERLINEA);
-          mixerGetLineInfoA (dev, &mixer, MIXER_OBJECTF_AUX);
+          mixerGetLineInfoA ((HMIXEROBJ)dev, &mixer, MIXER_OBJECTF_AUX);
         } while (!strstr (mixer.szName, "CD") && dev > 0);
       }
     }
   }
 
-  DWORD pamx;
+  MIXERCONTROLA pamx;
   controls.dwLineID = mixer.dwLineID;
   controls.cControls = mixer.cControls;
   controls.cbmxctrl = sizeof (MIXERCONTROLA);
   controls.pamxctrl = &pamx;
   controls.dwControlType = MIXERCONTROL_CONTROLTYPE_VOLUME;
-  mixerGetLineControlsA (sound->card, &controls, MIXER_GETLINECONTROLSF_ONEBYTYPE);
+  mixerGetLineControlsA (this->card, &controls, MIXER_GETLINECONTROLSF_ONEBYTYPE);
 
   details.cbStruct = sizeof (MIXERCONTROLDETAILS);
   details.dwControlID = NULL;  // TODO: what value actually gets put here? does it matter?
@@ -82,7 +79,7 @@ static VOID MixerUpdateComponentVolume (SoundContext* sound, DWORD component_typ
   details.cbDetails = sizeof (DWORD);
   details.paDetails = &volume;
   details.cMultipleItems = 0;
-  return mixerSetControlDetails (sound->card, &details, MIXER_SETCONTROLDETAILSF_VALUE);
+  return mixerSetControlDetails (this->card, &details, MIXER_SETCONTROLDETAILSF_VALUE);
 }
 
 /**
@@ -90,11 +87,10 @@ static VOID MixerUpdateComponentVolume (SoundContext* sound, DWORD component_typ
  *
  * @address        0x00486BB4
  *
- * @param[in,out]  sound               Sound context.
  * @param[in]      use_game_vol        TRUE to update with game volume,
  *                                     FALSE to update with user-provided volume.
  */
-VOID MixerUpdateVolume (SoundContext* sound, DWORD use_game_vol)
+VOID SoundContext::MixerUpdateVolume (DWORD use_game_vol)
 {
   MMRESULT result;
 
@@ -107,29 +103,29 @@ VOID MixerUpdateVolume (SoundContext* sound, DWORD use_game_vol)
   if (use_game_vol) {
     // TODO: Indexing into an array with the value of a handle doesn't seem right.
     // What is this code actually doing?
-    memcpy (&volume, &sound->game_vol[sound->card], sizeof (MixerVolume));
+    memcpy (&volume, &this->game_vol[this->card], sizeof (MixerVolume));
   } else {
-    memcpy (&volume, &sound->user_vol, sizeof (MixerVolume));
+    memcpy (&volume, &this->user_vol, sizeof (MixerVolume));
   }
 
-  MixerUpdateComponentVolume (sound, MIXERLINE_COMPONENTTYPE_DST_SPEAKERS, &volume.speaker_vol);
-  MixerUpdateComponentVolume (sound, MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC, &volume.cd_vol);
-  MixerUpdateComponentVolume (sound, MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT, &volume.waveout_vol);
+  MixerUpdateComponentVolume (MIXERLINE_COMPONENTTYPE_DST_SPEAKERS, volume.speaker_vol);
+  MixerUpdateComponentVolume (MIXERLINE_COMPONENTTYPE_SRC_COMPACTDISC, volume.cd_vol);
+  MixerUpdateComponentVolume (MIXERLINE_COMPONENTTYPE_SRC_WAVEOUT, volume.waveout_vol);
 
   // Update bass levels
-  if (sound->maybe_sound_enabled) {
+  if (this->maybe_sound_enabled) {
     mixer.cbStruct = sizeof (MIXERLINEA);
     mixer.dwComponentType = MIXERLINE_COMPONENTTYPE_DST_SPEAKERS;
-    result = mixerGetLineInfoA (sound->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE);
+    result = mixerGetLineInfoA (this->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE);
     if (MM_SUCCEEDED (result)) {
-      DWORD pamx;
+      MIXERCONTROLA pamx;
       controls.dwLineID = mixer.dwLineID;
       controls.cbStruct = sizeof (MIXERLINECONTROLSA);
       controls.cControls = mixer.cControls;
       controls.cbmxctrl = sizeof (MIXERCONTROLA);
       controls.pamxctrl = &pamx;
       controls.dwControlType = MIXERCONTROL_CONTROLTYPE_BASS;
-      result = mixerGetLineControlsA (sound->card, &controls, MIXER_GETLINECONTROLSF_ONEBYTYPE);
+      result = mixerGetLineControlsA (this->card, &controls, MIXER_GETLINECONTROLSF_ONEBYTYPE);
       if (MM_SUCCEEDED (result)) {
         details.cbStruct = sizeof (MIXERCONTROLDETAILS);
         details.dwControlID = NULL;  // TODO: what value actually gets put here? does it matter?
@@ -137,29 +133,29 @@ VOID MixerUpdateVolume (SoundContext* sound, DWORD use_game_vol)
         details.cbDetails = sizeof (DWORD);
         details.cMultipleItems = 0;
         details.paDetails = &volume.bass_vol;
-        result = mixerSetControlDetails (sound->card, &details, MIXER_SETCONTROLDETAILSF_VALUE);
+        result = mixerSetControlDetails (this->card, &details, MIXER_SETCONTROLDETAILSF_VALUE);
       } else {
-        sound->maybe_sound_enabled = 0;
+        this->maybe_sound_enabled = 0;
       }
     } else {
-      sound->maybe_sound_enabled = 0;
+      this->maybe_sound_enabled = 0;
     }
   }
 
   // Update treble levels
-  if (sound->maybe_sound_enabled) {
+  if (this->maybe_sound_enabled) {
     mixer.cbStruct = sizeof (MIXERLINEA);
     mixer.dwComponentType = MIXERLINE_COMPONENTTYPE_DST_SPEAKERS;
-    result = mixerGetLineInfoA (sound->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE);
+    result = mixerGetLineInfoA (this->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE);
     if (MM_SUCCEEDED (result)) {
-      DWORD pamx;
+      MIXERCONTROLA pamx;
       controls.dwLineID = mixer.dwLineID;
       controls.cbStruct = sizeof (MIXERLINECONTROLSA);
       controls.cControls = mixer.cControls;
       controls.cbmxctrl = sizeof (MIXERCONTROLA);
       controls.pamxctrl = &pamx;
       controls.dwControlType = MIXERCONTROL_CONTROLTYPE_TREBLE;
-      result = mixerGetLineControlsA (sound->card, &controls, MIXER_GETLINECONTROLSF_ONEBYTYPE);
+      result = mixerGetLineControlsA (this->card, &controls, MIXER_GETLINECONTROLSF_ONEBYTYPE);
       if (MM_SUCCEEDED (result)) {
         details.cbStruct = sizeof (MIXERCONTROLDETAILS);
         details.dwControlID = NULL;  // TODO: what value actually gets put here? does it matter?
@@ -167,12 +163,12 @@ VOID MixerUpdateVolume (SoundContext* sound, DWORD use_game_vol)
         details.cbDetails = sizeof (DWORD);
         details.cMultipleItems = 0;
         details.paDetails = &volume.treble_vol;
-        result = mixerSetControlDetails (sound->card, &details, MIXER_SETCONTROLDETAILSF_VALUE);
+        result = mixerSetControlDetails (this->card, &details, MIXER_SETCONTROLDETAILSF_VALUE);
       } else {
-        sound->maybe_sound_enabled = 0;
+        this->maybe_sound_enabled = 0;
       }
     } else {
-      sound->maybe_sound_enabled = 0;
+      this->maybe_sound_enabled = 0;
     }
   }
 }
@@ -181,10 +177,8 @@ VOID MixerUpdateVolume (SoundContext* sound, DWORD use_game_vol)
  * Get the sound card and initialize volume mixer structures.
  *
  * @address        0x004868CC
- *
- * @param[in,out]  sound               Sound context.
  */
-VOID MixerInit (SoundContext* sound)
+VOID SoundContext::MixerInit ()
 {
   MIXERLINEA mixer;
   MIXERCONTROLA ctrl;
@@ -192,14 +186,14 @@ VOID MixerInit (SoundContext* sound)
   MIXERCONTROLDETAILS details;
   MIXERCONTROLDETAILS_UNSIGNED det;
 
-  if (REG_FAILED (TmRegistryQueryKeyDword (sound->reg_key, "SoundCardID", sound->card))) {
-    sound->card = 0;
-    TmRegistrySetKeyDword (sound->reg_key, "SoundCardID", sound->card);
+  if (REG_FAILED (TmRegistryQueryKeyDword (this->reg_key, "SoundCardID", (LPDWORD)this->card))) {
+    this->card = 0;
+    TmRegistrySetKeyDword (this->reg_key, "SoundCardID", (DWORD)this->card);
   }
 
   mixer.cbStruct = sizeof (MIXERLINEA);
   mixer.dwComponentType = MIXERLINE_COMPONENTTYPE_DST_SPEAKERS;
-  if (MM_SUCCEEDED (mixerGetLineInfoA (sound->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE))) {
+  if (MM_SUCCEEDED (mixerGetLineInfoA (this->card, &mixer, MIXER_GETLINEINFOF_COMPONENTTYPE))) {
     controls.dwLineID = mixer.dwLineID;
     controls.cControls = mixer.cControls;
     controls.cbmxctrl = sizeof (MIXERCONTROLA);
@@ -207,28 +201,28 @@ VOID MixerInit (SoundContext* sound)
     controls.pamxctrl = &ctrl;
     controls.dwControlType = MIXERCONTROL_CONTROLTYPE_BASS;
     if (MM_SUCCEEDED (
-          mixerGetLineControlsA (sound->card, &controls, MIXER_GETLINECONTROLSF_ONEBYTYPE))) {
+          mixerGetLineControlsA (this->card, &controls, MIXER_GETLINECONTROLSF_ONEBYTYPE))) {
       details.dwControlID = ctrl.dwControlID;
       details.cbStruct = sizeof (MIXERCONTROLDETAILS);
       details.cChannels = mixer.cChannels;
       details.cbDetails = sizeof (MIXERCONTROLDETAILS_UNSIGNED);
       details.paDetails = &det;
       details.cMultipleItems = 0;
-      mixerGetControlDetailsA (sound->card, &details, MIXER_GETCONTROLDETAILSF_VALUE);
+      mixerGetControlDetailsA (this->card, &details, MIXER_GETCONTROLDETAILSF_VALUE);
     } else {
-      sound->maybe_sound_enabled = 0;
+      this->maybe_sound_enabled = 0;
     }
   } else {
-    sound->maybe_sound_enabled = 0;
+    this->maybe_sound_enabled = 0;
   }
 
-  int bufSize = 60;
+  int bufSize = sizeof (this->game_vol);
   if (REG_FAILED (
-        TmRegistryQueryKeyRaw (sound->reg_key, "GameVolume", sound->game_vol, &bufSize))) {
-    memcpy (&sound->game_vol[0], &sound->user_vol, 20);
-    memcpy (&sound->game_vol[1], &sound->user_vol, 20);
-    memcpy (&sound->game_vol[2], &sound->user_vol, 20);
-    MixerUseDefaultVolume (sound);
-    TmRegistrySetKeyRaw (sound->reg_key, "GameVolume", sound->game_vol, 60);
+        TmRegistryQueryKeyRaw (this->reg_key, "GameVolume", (LPBYTE)this->game_vol, bufSize))) {
+    memcpy (&this->game_vol[0], &this->user_vol, 20);
+    memcpy (&this->game_vol[1], &this->user_vol, 20);
+    memcpy (&this->game_vol[2], &this->user_vol, 20);
+    MixerUseDefaultVolume ();
+    TmRegistrySetKeyRaw (this->reg_key, "GameVolume", (LPBYTE)this->game_vol, bufSize);
   }
 }

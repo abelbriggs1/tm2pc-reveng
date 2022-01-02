@@ -4,11 +4,11 @@
  * Win32 filesystem functions.
  */
 
-#include <windows.h>
+#include "internal/win32_internal.h"
 
 #include "tm2.h"
 
-#include "internal/win32_internal.h"
+#include "internal/error.h"
 
 #define PATH_LEN 300
 

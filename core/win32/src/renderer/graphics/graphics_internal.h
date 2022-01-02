@@ -10,11 +10,7 @@
 #ifndef TM_GRAPHICS_INTERNAL_H
 #define TM_GRAPHICS_INTERNAL_H
 
-// TM2 mostly uses D3D/DirectDraw2 structures, but was compiled
-// with DX5.
-#define DIRECT3D_VERSION 0x0500
-
-#include <windows.h>
+#include "internal/win32_internal.h"
 
 #include <d3d.h>
 #include <ddraw.h>
@@ -22,8 +18,6 @@
 #include <stdint.h>
 
 #include "tm2.h"
-
-#include "internal/win32_internal.h"
 
 #include "graphics_impl.hpp"
 #include "texture.h"

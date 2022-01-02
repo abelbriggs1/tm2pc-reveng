@@ -10,14 +10,12 @@
 #ifndef TM_WINDOW_INTERNAL_H
 #define TM_WINDOW_INTERNAL_H
 
-#include <windows.h>
+#include "internal/win32_internal.h"
 
 #include "tm2.h"
 
-#include "internal/win32_internal.h"
+#include "window_impl.hpp"
 
 #include "window.h"
-
-#include "window_impl.h"
 
 #endif /* TM_WINDOW_INTERNAL_H */

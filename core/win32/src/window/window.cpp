@@ -37,12 +37,12 @@ VOID TmWindowInit (DWORD ex_style,
                    DWORD y,
                    DWORD width,
                    DWORD height,
-                   HINSTANCE parent,
+                   HWND parent,
                    LPCSTR menu_name,
                    HINSTANCE instance)
 {
-  WindowInit (&window, ex_style, class_name, window_name, style, x, y, width, height, parent,
-              menu_name, instance);
+  window.Init (ex_style, class_name, window_name, style, x, y, width, height, parent, menu_name,
+               instance);
 }
 
 /**
@@ -52,7 +52,7 @@ VOID TmWindowInit (DWORD ex_style,
  */
 VOID TmWindowDeinit ()
 {
-  WindowDeinit (&window);
+  window.Deinit ();
 }
 
 /**
@@ -64,7 +64,7 @@ VOID TmWindowDeinit ()
  */
 HWND TmWindowGetHwnd ()
 {
-  return WindowGetHwnd (&window);
+  return window.GetHwnd ();
 }
 
 /**
@@ -74,10 +74,11 @@ HWND TmWindowGetHwnd ()
  *
  * @param[in]      cmd_show            Command value. See Win32 ShowWindow() documentation for
  *                                     more information.
+ *
  * @return         0                   The window was previously hidden before this call.
  * @return         other               The window was previously visible before this call.
  */
 BOOL TmWindowShow (int cmd_show)
 {
-  return WindowShow (&window, cmd_show);
+  return window.Show (cmd_show);
 }

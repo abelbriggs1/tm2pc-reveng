@@ -4,13 +4,13 @@
  * Win32-specific error handling.
  */
 
-#include <windows.h>
+#include "internal/win32_internal.h"
 
 #include <stdarg.h>
 
 #include "tm2.h"
 
-#include "internal/win32_internal.h"
+#include "error.h"
 
 #define RETRY_YES (MB_ICONEXCLAMATION | MB_RETRYCANCEL)  // 0x35
 #define RETRY_NO (MB_ICONEXCLAMATION | MB_OK)            // 0x30

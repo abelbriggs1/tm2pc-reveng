@@ -4,11 +4,9 @@
  * Windows COM functions.
  */
 
-#include <windows.h>
+#include "internal/win32_internal.h"
 
 #include "tm2.h"
-
-#include "internal/win32_internal.h"
 
 /**
  * Load a module into the address space of the process and return

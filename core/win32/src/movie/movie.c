@@ -4,13 +4,9 @@
  * Video/movie handling functions.
  */
 
-#include <windows.h>
-
-#include "tm2.h"
-
 #include "internal/win32_internal.h"
 
-#include "movie.h"
+#include "tm2.h"
 
 static BOOL aviVideoOpen;  // @address 0x00C8511C
 

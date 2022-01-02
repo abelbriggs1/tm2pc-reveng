@@ -15,5 +15,5 @@ static SoundContext sound;  // @address 0x00624EDC
  */
 void TmSoundInit ()
 {
-  SoundInit (&sound);
+  sound.Init ();
 }

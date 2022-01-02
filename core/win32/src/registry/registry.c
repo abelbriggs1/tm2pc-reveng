@@ -4,11 +4,9 @@
  * Wrapper library for Win32 registry operations.
  */
 
-#include <windows.h>
+#include "internal/win32_internal.h"
 
 #include "tm2.h"
-
-#include "internal/win32_internal.h"
 
 #include "registry.h"
 

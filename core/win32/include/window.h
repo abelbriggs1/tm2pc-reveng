@@ -34,7 +34,7 @@ VOID TmWindowInit (DWORD ex_style,
                    DWORD y,
                    DWORD width,
                    DWORD height,
-                   HINSTANCE parent,
+                   HWND parent,
                    LPCSTR menu_name,
                    HINSTANCE instance);
 
