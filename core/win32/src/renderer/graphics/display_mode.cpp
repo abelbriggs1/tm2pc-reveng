@@ -1,7 +1,7 @@
 /**
  * @file display.c
  *
- * Internal graphics context display functions.
+ * Internal graphics context display mode functions.
  */
 
 #include "graphics_internal.h"
@@ -11,7 +11,7 @@
  * determine if the display mode is valid and add it to the graphics context's
  * list of enumerated display modes if so.
  *
- * This function is a callback for IDirectDraw2_EnumDisplayModes and
+ * This function is a callback for DirectDraw's EnumDisplayModes and
  * should not be called by normal means.
  *
  * @address        0x004B592C
@@ -75,20 +75,19 @@ int CompareDisplayModes (const void* arg1, const void* arg2)
  *
  * @address        0x004B5874
  *
- * @param[in]      graphics            Graphics context.
  * @param[in,out]  caps                Internal capabilities structure.
  *
  * @return         DD_OK               Hardware capabilities were successfully retrieved.
  * @return         other               An error occurred retrieving hardware capabilities.
  */
-HRESULT GetHardwareCapabilities (GraphicsContext* graphics, DisplayCapabilities* caps)
+HRESULT GraphicsContext::GetHardwareCapabilities (DisplayCapabilities* caps)
 {
   memset (&caps->hw_caps, 0, sizeof (caps->hw_caps));
   caps->hw_caps.dwSize = sizeof (caps->hw_caps);
   memset (&caps->hel_caps, 0, sizeof (caps->hel_caps));
   caps->hel_caps.dwSize = sizeof (caps->hw_caps);
 
-  HRESULT result = IDirectDraw2_GetCaps (graphics->ddraw2, &caps->hw_caps, &caps->hel_caps);
+  HRESULT result = this->ddraw2->GetCaps ((LPDDCAPS)&caps->hw_caps, (LPDDCAPS)&caps->hel_caps);
   if (SUCCEEDED (result)) {
     caps->hw_supports_3d = (caps->hw_caps.dwCaps & DDCAPS_3D) != 0;
     caps->hw_bank_switched = (caps->hw_caps.dwCaps & DDCAPS_BANKSWITCHED) != 0;

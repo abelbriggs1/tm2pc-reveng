@@ -19,19 +19,22 @@
 #include <d3d.h>
 #include <ddraw.h>
 
+#include <stdint.h>
+
 #include "tm2.h"
 
 #include "internal/win32_internal.h"
 
+#include "graphics_impl.hpp"
+#include "texture.h"
+
 #include "graphics.h"
 
-#include "clipper.h"
-#include "display.h"
-#include "graphics_impl.h"
-#include "surface.h"
-#include "texture.h"
+// Max number of video buffers.
+#define MAX_BUFFERS 3
 
 // Defined in graphics_impl.c
 extern DWORD unk_graphics_init_flag;
+extern ColorDepth color_depth;
 
 #endif /* TM_GRAPHICS_INTERNAL_H */

@@ -1,11 +1,21 @@
 /**
  * @file graphics.h
  *
- * Public API for graphics functions.
+ * Public C API for graphics functions.
  */
 
 #ifndef TM_GRAPHICS_H
 #define TM_GRAPHICS_H
+
+#define COLOR_MASK_R_15 0x7C00
+#define COLOR_MASK_G_15 0x03E0
+#define COLOR_MASK_B_15 0x001F
+
+#define COLOR_MASK_R_16 0xF800
+#define COLOR_MASK_G_16 0x07E0
+#define COLOR_MASK_B_16 0x001F
+
+typedef enum { COLOR_DEPTH_15 = 0, COLOR_DEPTH_16 = 1, COLOR_DEPTH_UNKNOWN = 2 } ColorDepth;
 
 /**
  * Initialize the graphics module.
@@ -16,6 +26,31 @@
  * @return         others                    An error occurred during initialization.
  */
 int TmGraphicsInit (int unknown_graphics_flag);
+
+/**
+ * Swap the primary and back framebuffers.
+ *
+ * @return         0                   The framebuffer was swapped successfully.
+ * @return         others              An error occurred swapping the framebuffers.
+ */
+int TmGraphicsSwapFramebuffer ();
+
+/**
+ * Fill the primary framebuffer with the specified color.
+ *
+ * @param[in]      color               16-bit color to fill the framebuffer.
+ *
+ * @return         0                   The framebuffer was successfully filled.
+ * @return         others              An error occurred filling the framebuffer.
+ */
+int TmGraphicsFillFramebuffer (uint16_t color);
+
+/**
+ * Fill all framebuffers with the specified color.
+ *
+ * @param[in]      color               16-bit color to fill the framebuffers.
+ */
+void TmGraphicsFillFramebuffers (uint16_t color);
 
 /**
  * Get the current display width.

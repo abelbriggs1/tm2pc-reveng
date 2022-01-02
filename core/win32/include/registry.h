@@ -105,7 +105,7 @@ LSTATUS TmRegistryCloseKey (PHKEY key);
  * @return         other                 An error occurred querying the key. See the documentation
  *                                       for Win32 RegQueryValueExA() for more information.
  */
-LSTATUS TmRegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, LPDWORD size);
+LSTATUS TmRegistryQueryKeyRaw (PHKEY key, LPCSTR value_name, LPBYTE data, DWORD size);
 
 /**
  * Retrieve a DWORD for a registry value associated with the given open registry key.

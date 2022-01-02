@@ -8,8 +8,9 @@
 #ifndef TM_TM2_H
 #define TM_TM2_H
 
+#define ARRAY_SIZE(arr) (sizeof (arr) / sizeof ((arr)[0]))
+
 #include "fs.h"
-#include "graphics.h"
 #include "movie.h"
 #include "sound.h"
 
